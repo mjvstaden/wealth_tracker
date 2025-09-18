@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth0 } from '@auth0/auth0-react';
 import { 
   TrendingUp, 
   PieChart, 
@@ -14,6 +15,15 @@ import {
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
+  const { loginWithRedirect, isAuthenticated } = useAuth0();
+
+  const handleGetStarted = () => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    } else {
+      loginWithRedirect();
+    }
+  };
 
   const features = [
     {
@@ -113,10 +123,10 @@ const LandingPage: React.FC = () => {
                 About
               </button>
               <button 
-                onClick={() => navigate('/dashboard')}
+                onClick={handleGetStarted}
                 className="btn-primary"
               >
-                Get Started
+                {isAuthenticated ? 'Go to Dashboard' : 'Sign In'}
               </button>
             </div>
           </div>
@@ -136,10 +146,10 @@ const LandingPage: React.FC = () => {
             </p>
             <div className="flex items-center justify-center space-x-4">
               <button 
-                onClick={() => navigate('/dashboard')}
+                onClick={handleGetStarted}
                 className="btn-primary flex items-center space-x-2"
               >
-                <span>Start Free Trial</span>
+                <span>{isAuthenticated ? 'Go to Dashboard' : 'Start Free Trial'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
               <button className="btn-secondary">
@@ -249,7 +259,10 @@ const LandingPage: React.FC = () => {
                     </li>
                   ))}
                 </ul>
-                <button className={tier.highlighted ? 'btn-primary w-full' : 'btn-secondary w-full'}>
+                <button 
+                  onClick={handleGetStarted}
+                  className={tier.highlighted ? 'btn-primary w-full' : 'btn-secondary w-full'}
+                >
                   Get Started
                 </button>
               </div>
@@ -268,10 +281,10 @@ const LandingPage: React.FC = () => {
             Join thousands of investors who are taking control of their financial future.
           </p>
           <button 
-            onClick={() => navigate('/dashboard')}
+            onClick={handleGetStarted}
             className="bg-white text-deep-navy px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition-colors duration-200"
           >
-            Get Started Free
+            {isAuthenticated ? 'Go to Dashboard' : 'Get Started Free'}
           </button>
         </div>
       </section>

@@ -1,11 +1,16 @@
-import React from 'react';
-import { Menu, Bell, User, Search } from 'lucide-react';
+import React, { useState } from 'react';
+import { Menu, Bell, Search, LogOut, Settings, User as UserIcon } from 'lucide-react';
+import { useAuth0 } from '@auth0/auth0-react';
+import { UserProfile, LogoutButton } from '../auth';
 
 interface HeaderProps {
   onMenuClick: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
+  const { user, isAuthenticated } = useAuth0();
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4">
       <div className="flex items-center justify-between">
@@ -45,15 +50,56 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           </button>
 
           {/* Profile Dropdown */}
-          <button className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-light-gray transition-colors duration-200">
-            <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
-              <User className="w-4 h-4 text-white" />
+          {isAuthenticated && user && (
+            <div className="relative">
+              <button 
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-light-gray transition-colors duration-200"
+              >
+                {user.picture ? (
+                  <img 
+                    src={user.picture} 
+                    alt={user.name || 'User'}
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
+                    <UserIcon className="w-4 h-4 text-white" />
+                  </div>
+                )}
+                <div className="text-left hidden sm:block">
+                  <p className="text-sm font-medium text-deep-navy">{user.name || user.email}</p>
+                  <p className="text-xs text-medium-gray">
+                    {user.email}
+                  </p>
+                </div>
+              </button>
+
+              {/* Dropdown Menu */}
+              {showProfileMenu && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                  <div className="px-4 py-2 border-b border-gray-100">
+                    <p className="text-sm font-medium text-deep-navy">{user.name || 'User'}</p>
+                    <p className="text-xs text-medium-gray">{user.email}</p>
+                  </div>
+                  
+                  <button className="w-full text-left px-4 py-2 text-sm text-dark-gray hover:bg-light-gray flex items-center space-x-2">
+                    <UserIcon className="w-4 h-4" />
+                    <span>Profile</span>
+                  </button>
+                  
+                  <button className="w-full text-left px-4 py-2 text-sm text-dark-gray hover:bg-light-gray flex items-center space-x-2">
+                    <Settings className="w-4 h-4" />
+                    <span>Settings</span>
+                  </button>
+                  
+                  <div className="border-t border-gray-100 mt-2 pt-2">
+                    <LogoutButton />
+                  </div>
+                </div>
+              )}
             </div>
-            <div className="text-left hidden sm:block">
-              <p className="text-sm font-medium text-deep-navy">John Doe</p>
-              <p className="text-xs text-medium-gray">Premium Account</p>
-            </div>
-          </button>
+          )}
         </div>
       </div>
     </header>
