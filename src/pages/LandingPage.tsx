@@ -110,7 +110,10 @@ const LandingPage: React.FC = () => {
               <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center">
                 <TrendingUp className="w-6 h-6 text-white" />
               </div>
-              <span className="text-xl font-bold text-deep-navy">WealthTracker</span>
+              <div>
+                <span className="text-xl font-bold text-deep-navy">True North</span>
+                <span className="text-sm text-medium-gray ml-2">Wealth Analytics</span>
+              </div>
             </div>
             <div className="flex items-center space-x-4">
               <button className="text-dark-gray hover:text-deep-navy transition-colors">
@@ -298,7 +301,10 @@ const LandingPage: React.FC = () => {
                 <div className="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center">
                   <TrendingUp className="w-6 h-6 text-white" />
                 </div>
-                <span className="text-xl font-bold">WealthTracker</span>
+                <div>
+                  <div className="text-xl font-bold">True North</div>
+                  <div className="text-sm text-white/80">Wealth Analytics</div>
+                </div>
               </div>
               <p className="text-white/60 text-sm">Professional-grade tools for personal wealth building.</p>
             </div>
@@ -330,8 +336,8 @@ const LandingPage: React.FC = () => {
             </div>
           </div>
           <div className="border-t border-white/10 mt-8 pt-8 text-center text-white/40 text-sm">
-            © 2024 WealthTracker. All rights reserved.
-          </div>
+            © 2025 True North Wealth Analytics. All rights reserved.
+         </div>
         </div>
       </footer>
     </div>

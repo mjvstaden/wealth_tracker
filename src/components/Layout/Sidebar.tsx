@@ -38,8 +38,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
           </div>
           {isOpen && (
             <div className="animate-fade-in">
-              <h1 className="text-xl font-bold text-deep-navy">WealthTracker</h1>
-              <p className="text-xs text-medium-gray">Model. Analyze. Optimize.</p>
+              <div>
+                <h1 className="text-xl font-bold text-deep-navy">True North</h1>
+                <p className="text-sm font-medium text-medium-gray">Wealth Analytics</p>
+              </div>
+              {/* <p className="text-xs text-medium-gray mt-1">Model. Analyze. Optimize.</p> */}
             </div>
           )}
         </div>

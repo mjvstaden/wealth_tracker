@@ -1,4 +1,6 @@
-# Getting Started with Create React App
+# True North Wealth Analytics
+
+Professional-grade portfolio tracking and financial modeling tools that transform complex planning into clear, actionable insights.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
