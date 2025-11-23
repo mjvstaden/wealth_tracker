@@ -28,13 +28,13 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
 
   // Chart dimensions - responsive based on screen size
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-  const width = isMobile ? 600 : 800;
-  const height = isMobile ? 300 : 400;
+  const width = isMobile ? 500 : 800;
+  const height = isMobile ? 280 : 400;
   const padding = {
     top: 20,
     right: isMobile ? 10 : 20,
-    bottom: isMobile ? 40 : 50,
-    left: isMobile ? 50 : 80
+    bottom: isMobile ? 35 : 50,
+    left: isMobile ? 45 : 80
   };
   const chartWidth = width - padding.left - padding.right;
   const chartHeight = height - padding.top - padding.bottom;
@@ -127,11 +127,11 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
   return (
     <div className={`relative ${className}`}>
       {/* Chart container */}
-      <div className="w-full overflow-x-auto scrollbar-hide">
+      <div className="w-full">
         <svg
           viewBox={`0 0 ${width} ${height}`}
           className="w-full h-auto animate-fade-in-up"
-          style={{ minWidth: isMobile ? '500px' : '600px' }}
+          style={{ maxWidth: '100%' }}
         >
           {/* Definitions for gradients */}
           <defs>

@@ -464,28 +464,30 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
       </div>
 
       {/* Net Worth Chart */}
-      <div className="card overflow-hidden">
+      <div className="card">
         <div className="space-y-4 sm:space-y-6">
-          <h3 className="font-display text-base sm:text-lg md:text-xl font-semibold text-text-primary uppercase tracking-wider text-center">
+          <h3 className="font-display text-base sm:text-lg md:text-xl font-semibold text-text-primary uppercase tracking-wider text-center px-4">
             Net Worth Over Time
           </h3>
 
-          <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
-            <NetWorthChart
-              buyBreakdown={results.buyBreakdown}
-              rentBreakdown={results.rentBreakdown}
-            />
+          <div className="w-full overflow-x-auto">
+            <div className="min-w-full px-4">
+              <NetWorthChart
+                buyBreakdown={results.buyBreakdown}
+                rentBreakdown={results.rentBreakdown}
+              />
+            </div>
           </div>
         </div>
       </div>
 
       {/* Year-by-Year Breakdown Table */}
-      <div className="card overflow-hidden">
+      <div className="card">
         <div className="space-y-4 sm:space-y-6">
           {/* Header with toggle */}
           <button
             onClick={() => setShowBreakdown(!showBreakdown)}
-            className="w-full flex items-center justify-between group"
+            className="w-full flex items-center justify-between group px-4"
           >
             <h3 className="font-display text-base sm:text-lg md:text-xl font-semibold text-text-primary uppercase tracking-wider">
               Year-by-Year Breakdown
@@ -513,8 +515,9 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
 
           {/* Table */}
           {showBreakdown && (
-            <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0 animate-fade-in-up">
-              <table className="w-full text-xs sm:text-sm min-w-[600px]">
+            <div className="w-full overflow-x-auto animate-fade-in-up">
+              <div className="px-4">
+                <table className="w-full text-xs sm:text-sm min-w-[500px]">
                 <thead>
                   <tr className="border-b border-border-default">
                     <th className="label text-left py-2 sm:py-3 px-2 sm:px-4">Year</th>
@@ -561,6 +564,7 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
                   })}
                 </tbody>
               </table>
+              </div>
             </div>
           )}
         </div>
