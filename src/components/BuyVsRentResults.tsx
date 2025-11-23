@@ -107,40 +107,40 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
   const nextYearMonthlyRent = finalMonthlyRent * (1 + inputs.rentInputs.rentIncreaseRate / 100);
 
   return (
-    <div className={`space-y-12 ${className}`}>
+    <div className={`space-y-8 sm:space-y-12 ${className}`}>
       {/* Hero Summary */}
-      <div className="text-center space-y-6 animate-fade-in-up">
+      <div className="text-center space-y-4 sm:space-y-6 animate-fade-in-up">
         <div className="inline-block">
-          <span className="label text-accent-primary">Recommendation</span>
+          <span className="label text-accent-primary text-xs sm:text-sm">Recommendation</span>
         </div>
 
-        <h1 className="font-display text-4xl md:text-6xl font-bold text-text-primary">
+        <h1 className="font-display text-3xl sm:text-4xl md:text-6xl font-bold text-text-primary">
           {isBuyBetter ? 'Buying' : 'Renting'} is Better
         </h1>
 
         <div className="space-y-2">
-          <div className={`hero-number text-5xl md:text-7xl ${
+          <div className={`hero-number text-3xl sm:text-5xl md:text-7xl ${
             isBuyBetter ? 'text-accent-primary' : 'text-accent-light'
           }`}>
             {currency.format(totalDifference, true)}
           </div>
-          <p className="text-text-secondary text-lg">
+          <p className="text-text-secondary text-sm sm:text-base md:text-lg">
             {isBuyBetter ? 'more net worth' : 'advantage'} after {results.buyBreakdown.length} years
           </p>
         </div>
 
-        <p className="text-text-secondary text-base max-w-2xl mx-auto leading-relaxed">
+        <p className="text-text-secondary text-sm sm:text-base max-w-2xl mx-auto leading-relaxed px-4">
           {results.summary}
         </p>
       </div>
 
       {/* Key Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {/* Stat 1: Final Buy Net Worth */}
         <div className="card card-sweep opacity-0 animate-fade-in-up stagger-1">
           <div className="space-y-2">
-            <div className="label">Buy Net Worth</div>
-            <div className={`font-mono text-2xl font-bold ${
+            <div className="label text-xs sm:text-sm">Buy Net Worth</div>
+            <div className={`font-mono text-xl sm:text-2xl font-bold ${
               isBuyBetter ? 'text-accent-primary' : 'text-text-primary'
             }`}>
               {currency.format(results.finalBuyNetWorth, true)}
@@ -154,8 +154,8 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
         {/* Stat 2: Final Rent Net Worth */}
         <div className="card card-sweep opacity-0 animate-fade-in-up stagger-2">
           <div className="space-y-2">
-            <div className="label">Rent Net Worth</div>
-            <div className={`font-mono text-2xl font-bold ${
+            <div className="label text-xs sm:text-sm">Rent Net Worth</div>
+            <div className={`font-mono text-xl sm:text-2xl font-bold ${
               !isBuyBetter ? 'text-accent-light' : 'text-text-primary'
             }`}>
               {currency.format(results.finalRentNetWorth, true)}
@@ -169,8 +169,8 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
         {/* Stat 3: Difference */}
         <div className="card card-sweep opacity-0 animate-fade-in-up stagger-3">
           <div className="space-y-2">
-            <div className="label">Difference</div>
-            <div className="font-mono text-2xl font-bold text-success">
+            <div className="label text-xs sm:text-sm">Difference</div>
+            <div className="font-mono text-xl sm:text-2xl font-bold text-success">
               {currency.format(totalDifference, true)}
             </div>
             <div className="text-xs text-text-tertiary">
@@ -182,8 +182,8 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
         {/* Stat 4: Break Even Year */}
         <div className="card card-sweep opacity-0 animate-fade-in-up stagger-4">
           <div className="space-y-2">
-            <div className="label">Break Even</div>
-            <div className="font-mono text-2xl font-bold text-text-primary">
+            <div className="label text-xs sm:text-sm">Break Even</div>
+            <div className="font-mono text-xl sm:text-2xl font-bold text-text-primary">
               {results.breakEvenYear !== null ? `Year ${results.breakEvenYear}` : 'Never'}
             </div>
             <div className="text-xs text-text-tertiary">
@@ -197,30 +197,30 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
 
       {/* Side-by-Side Comparison - Single Card */}
       <div className="card opacity-0 animate-fade-in-up stagger-2">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 divide-y lg:divide-y-0 lg:divide-x divide-border-default">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 divide-y lg:divide-y-0 lg:divide-x divide-border-default">
 
           {/* BUY SCENARIO */}
-          <div className="space-y-6 pt-6 lg:pt-0">
+          <div className="space-y-4 sm:space-y-6 pt-6 lg:pt-0">
             <div className="flex items-center justify-between">
-              <h3 className="font-display text-2xl font-semibold text-text-primary uppercase tracking-wider">
+              <h3 className="font-display text-lg sm:text-xl md:text-2xl font-semibold text-text-primary uppercase tracking-wider">
                 Buying
               </h3>
               {isBuyBetter && (
-                <span className="badge badge-success">Winner</span>
+                <span className="badge badge-success text-xs">Winner</span>
               )}
             </div>
 
             {/* One-Time Costs */}
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               <div className="label text-accent-primary uppercase tracking-wider text-xs">One-Time Costs</div>
-              <div className="bg-bg-elevated rounded-md p-4 space-y-2">
-                <div className="flex justify-between items-baseline text-sm">
+              <div className="bg-bg-elevated rounded-md p-3 sm:p-4 space-y-2">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm">
                   <span className="text-text-secondary">Down Payment</span>
                   <span className="font-mono text-text-primary">
                     {currency.format(downPayment, false)}
                   </span>
                 </div>
-                <div className="flex justify-between items-baseline text-sm">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm">
                   <span className="text-text-secondary">Closing Costs</span>
                   <span className="font-mono text-text-primary">
                     {currency.format(closingCosts, false)}
@@ -230,42 +230,42 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
             </div>
 
             {/* Monthly Costs After Mortgage Paid Off */}
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               <div className="label text-accent-primary uppercase tracking-wider text-xs">Monthly Costs (After Paid Off)</div>
-              <div className="bg-bg-elevated rounded-md p-4 space-y-2">
-                <div className="flex justify-between items-baseline text-sm">
+              <div className="bg-bg-elevated rounded-md p-3 sm:p-4 space-y-2">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm">
                   <span className="text-text-secondary">Mortgage Payment</span>
                   <span className="font-mono text-success">
                     {currency.format(0, false)}
                   </span>
                 </div>
-                <div className="flex justify-between items-baseline text-sm">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm">
                   <span className="text-text-secondary">Property Tax</span>
                   <span className="font-mono text-text-primary">
                     {currency.format(nextYearPropertyTax, false)}
                   </span>
                 </div>
-                <div className="flex justify-between items-baseline text-sm">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm">
                   <span className="text-text-secondary">Insurance</span>
                   <span className="font-mono text-text-primary">
                     {currency.format(nextYearInsurance, false)}
                   </span>
                 </div>
                 {nextYearHOA > 0 && (
-                  <div className="flex justify-between items-baseline text-sm">
+                  <div className="flex justify-between items-baseline text-xs sm:text-sm">
                     <span className="text-text-secondary">HOA/Levies</span>
                     <span className="font-mono text-text-primary">
                       {currency.format(nextYearHOA, false)}
                     </span>
                   </div>
                 )}
-                <div className="flex justify-between items-baseline text-sm">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm">
                   <span className="text-text-secondary">Maintenance</span>
                   <span className="font-mono text-text-primary">
                     {currency.format(nextYearMaintenance, false)}
                   </span>
                 </div>
-                <div className="flex justify-between items-baseline text-sm pt-2 border-t border-border-subtle font-semibold">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm pt-2 border-t border-border-subtle font-semibold">
                   <span className="text-text-primary">Total Monthly</span>
                   <span className="font-mono text-text-primary">
                     {currency.format(nextYearTotalMonthly, false)}
@@ -275,42 +275,42 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
             </div>
 
             {/* Total Costs Over Time Horizon */}
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               <div className="label text-accent-primary uppercase tracking-wider text-xs">Total Costs ({timeHorizon} Years)</div>
-              <div className="bg-bg-elevated rounded-md p-4 space-y-2">
-                <div className="flex justify-between items-baseline text-sm">
+              <div className="bg-bg-elevated rounded-md p-3 sm:p-4 space-y-2">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm">
                   <span className="text-text-secondary">Mortgage Payments</span>
                   <span className="font-mono text-text-primary">
                     {currency.format(totalMortgagePayments, false)}
                   </span>
                 </div>
-                <div className="flex justify-between items-baseline text-sm">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm">
                   <span className="text-text-secondary">Property Tax</span>
                   <span className="font-mono text-text-primary">
                     {currency.format(totalPropertyTax, false)}
                   </span>
                 </div>
-                <div className="flex justify-between items-baseline text-sm">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm">
                   <span className="text-text-secondary">Insurance</span>
                   <span className="font-mono text-text-primary">
                     {currency.format(totalInsurance, false)}
                   </span>
                 </div>
                 {totalHOA > 0 && (
-                  <div className="flex justify-between items-baseline text-sm">
+                  <div className="flex justify-between items-baseline text-xs sm:text-sm">
                     <span className="text-text-secondary">HOA/Levies</span>
                     <span className="font-mono text-text-primary">
                       {currency.format(totalHOA, false)}
                     </span>
                   </div>
                 )}
-                <div className="flex justify-between items-baseline text-sm">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm">
                   <span className="text-text-secondary">Maintenance</span>
                   <span className="font-mono text-text-primary">
                     {currency.format(totalMaintenance, false)}
                   </span>
                 </div>
-                <div className="flex justify-between items-baseline text-sm pt-2 border-t border-border-subtle font-semibold">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm pt-2 border-t border-border-subtle font-semibold">
                   <span className="text-text-primary">Total Paid</span>
                   <span className="font-mono text-text-primary">
                     {currency.format(totalBuyingCosts, false)}
@@ -320,36 +320,36 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
             </div>
 
             {/* Final Position */}
-            <div className="space-y-3 pt-4 border-t border-border-accent">
+            <div className="space-y-2 sm:space-y-3 pt-4 border-t border-border-accent">
               <div className="label text-accent-primary uppercase tracking-wider text-xs">Final Position</div>
-              <div className="bg-bg-elevated rounded-md p-4 space-y-2">
-                <div className="flex justify-between items-baseline text-sm">
+              <div className="bg-bg-elevated rounded-md p-3 sm:p-4 space-y-2">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm">
                   <span className="text-text-secondary">Home Value</span>
                   <span className="font-mono text-text-primary">
                     {currency.format(results.buyBreakdown[results.buyBreakdown.length - 1].homeValue, false)}
                   </span>
                 </div>
-                <div className="flex justify-between items-baseline text-sm">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm">
                   <span className="text-text-secondary">Mortgage Balance</span>
                   <span className="font-mono text-text-primary">
                     {currency.format(results.buyBreakdown[results.buyBreakdown.length - 1].mortgageBalance, false)}
                   </span>
                 </div>
-                <div className="flex justify-between items-baseline text-sm">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm">
                   <span className="text-text-secondary">Home Equity</span>
                   <span className="font-mono text-text-primary">
                     {currency.format(results.buyBreakdown[results.buyBreakdown.length - 1].equity, false)}
                   </span>
                 </div>
                 {results.buyBreakdown[results.buyBreakdown.length - 1].investmentBalance > 0 && (
-                  <div className="flex justify-between items-baseline text-sm">
+                  <div className="flex justify-between items-baseline text-xs sm:text-sm">
                     <span className="text-text-secondary">Investment Balance</span>
                     <span className="font-mono text-success">
                       {currency.format(results.buyBreakdown[results.buyBreakdown.length - 1].investmentBalance, false)}
                     </span>
                   </div>
                 )}
-                <div className="flex justify-between items-baseline text-sm pt-2 border-t border-border-subtle font-semibold">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm pt-2 border-t border-border-subtle font-semibold">
                   <span className="text-accent-primary">NET WORTH</span>
                   <span className={`font-mono text-lg sm:text-2xl font-bold ${
                     isBuyBetter ? 'text-accent-primary' : 'text-text-primary'
@@ -362,43 +362,43 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
           </div>
 
           {/* RENT SCENARIO */}
-          <div className="space-y-6 pt-6 lg:pt-0 lg:pl-12">
+          <div className="space-y-4 sm:space-y-6 pt-6 lg:pt-0 lg:pl-6 xl:pl-12">
             <div className="flex items-center justify-between">
-              <h3 className="font-display text-2xl font-semibold text-text-primary uppercase tracking-wider">
+              <h3 className="font-display text-lg sm:text-xl md:text-2xl font-semibold text-text-primary uppercase tracking-wider">
                 Renting
               </h3>
               {!isBuyBetter && (
-                <span className="badge badge-success">Winner</span>
+                <span className="badge badge-success text-xs">Winner</span>
               )}
             </div>
 
             {/* One-Time Costs */}
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               <div className="label text-accent-light uppercase tracking-wider text-xs">Initial Investment</div>
-              <div className="bg-bg-elevated rounded-md p-4 space-y-2">
-                <div className="flex justify-between items-baseline text-sm">
+              <div className="bg-bg-elevated rounded-md p-3 sm:p-4 space-y-2">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm">
                   <span className="text-text-secondary">Down Payment Saved</span>
                   <span className="font-mono text-text-primary">
                     {currency.format(renterInitialInvestment, false)}
                   </span>
                 </div>
-                <div className="flex justify-between items-baseline text-sm text-text-tertiary">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm text-text-tertiary">
                   <span className="text-xs italic">Invested immediately instead of buying</span>
                 </div>
               </div>
             </div>
 
             {/* Monthly Costs After Time Horizon */}
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               <div className="label text-accent-light uppercase tracking-wider text-xs">Monthly Cost (Year {timeHorizon + 1})</div>
-              <div className="bg-bg-elevated rounded-md p-4 space-y-2">
-                <div className="flex justify-between items-baseline text-sm">
+              <div className="bg-bg-elevated rounded-md p-3 sm:p-4 space-y-2">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm">
                   <span className="text-text-secondary">Monthly Rent</span>
                   <span className="font-mono text-text-primary">
                     {currency.format(nextYearMonthlyRent, false)}
                   </span>
                 </div>
-                <div className="flex justify-between items-baseline text-sm pt-2 border-t border-border-subtle font-semibold">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm pt-2 border-t border-border-subtle font-semibold">
                   <span className="text-text-primary">Total Monthly</span>
                   <span className="font-mono text-text-primary">
                     {currency.format(nextYearMonthlyRent, false)}
@@ -408,10 +408,10 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
             </div>
 
             {/* Total Rent Paid */}
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               <div className="label text-accent-light uppercase tracking-wider text-xs">Total Rent ({timeHorizon} Years)</div>
-              <div className="bg-bg-elevated rounded-md p-4 space-y-2">
-                <div className="flex justify-between items-baseline text-sm">
+              <div className="bg-bg-elevated rounded-md p-3 sm:p-4 space-y-2">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm">
                   <span className="text-text-secondary">Total Rent Paid</span>
                   <span className="font-mono text-text-primary">
                     {currency.format(totalRentPaid, false)}
@@ -421,34 +421,34 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
             </div>
 
             {/* Final Position */}
-            <div className="space-y-3 pt-4 border-t border-border-accent">
+            <div className="space-y-2 sm:space-y-3 pt-4 border-t border-border-accent">
               <div className="label text-accent-light uppercase tracking-wider text-xs">Final Position</div>
-              <div className="bg-bg-elevated rounded-md p-4 space-y-2">
-                <div className="flex justify-between items-baseline text-sm">
+              <div className="bg-bg-elevated rounded-md p-3 sm:p-4 space-y-2">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm">
                   <span className="text-text-secondary">Initial Investment</span>
                   <span className="font-mono text-text-primary">
                     {currency.format(renterInitialInvestment, false)}
                   </span>
                 </div>
-                <div className="flex justify-between items-baseline text-sm">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm">
                   <span className="text-text-secondary">Monthly Contributions</span>
                   <span className="font-mono text-text-primary">
                     {currency.format(totalInvestmentContributions, false)}
                   </span>
                 </div>
-                <div className="flex justify-between items-baseline text-sm">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm">
                   <span className="text-text-secondary">Investment Growth</span>
                   <span className="font-mono text-success">
                     {currency.format(totalInvestmentGrowth, false)}
                   </span>
                 </div>
-                <div className="flex justify-between items-baseline text-sm">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm">
                   <span className="text-text-secondary">Total Investment Value</span>
                   <span className="font-mono text-text-primary">
                     {currency.format(totalInvestmentBalance, false)}
                   </span>
                 </div>
-                <div className="flex justify-between items-baseline text-sm pt-2 border-t border-border-subtle font-semibold">
+                <div className="flex justify-between items-baseline text-xs sm:text-sm pt-2 border-t border-border-subtle font-semibold">
                   <span className="text-accent-light">NET WORTH</span>
                   <span className={`font-mono text-lg sm:text-2xl font-bold ${
                     !isBuyBetter ? 'text-accent-light' : 'text-text-primary'
