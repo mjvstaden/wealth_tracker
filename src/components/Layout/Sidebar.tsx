@@ -23,7 +23,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
   return (
     <aside
       className={`fixed left-0 top-0 h-full bg-bg-primary border-r border-border-default z-20 transition-all duration-300 ${
-        isOpen ? 'w-64' : 'w-20'
+        isOpen ? 'w-64' : 'w-20 -translate-x-full lg:translate-x-0'
       }`}
     >
       {/* Logo Section */}

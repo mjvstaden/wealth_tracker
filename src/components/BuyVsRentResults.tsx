@@ -351,7 +351,7 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
                 )}
                 <div className="flex justify-between items-baseline text-sm pt-2 border-t border-border-subtle font-semibold">
                   <span className="text-accent-primary">NET WORTH</span>
-                  <span className={`font-mono text-2xl font-bold ${
+                  <span className={`font-mono text-lg sm:text-2xl font-bold ${
                     isBuyBetter ? 'text-accent-primary' : 'text-text-primary'
                   }`}>
                     {currency.format(results.finalBuyNetWorth, true)}
@@ -450,7 +450,7 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
                 </div>
                 <div className="flex justify-between items-baseline text-sm pt-2 border-t border-border-subtle font-semibold">
                   <span className="text-accent-light">NET WORTH</span>
-                  <span className={`font-mono text-2xl font-bold ${
+                  <span className={`font-mono text-lg sm:text-2xl font-bold ${
                     !isBuyBetter ? 'text-accent-light' : 'text-text-primary'
                   }`}>
                     {currency.format(results.finalRentNetWorth, true)}
@@ -512,14 +512,14 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
           {/* Table */}
           {showBreakdown && (
             <div className="overflow-x-auto animate-fade-in-up">
-              <table className="w-full text-sm">
+              <table className="w-full text-xs sm:text-sm">
                 <thead>
                   <tr className="border-b border-border-default">
-                    <th className="label text-left py-3 px-4">Year</th>
-                    <th className="label text-right py-3 px-4">Buy Net Worth</th>
-                    <th className="label text-right py-3 px-4">Rent Net Worth</th>
-                    <th className="label text-right py-3 px-4">Difference</th>
-                    <th className="label text-center py-3 px-4">Better</th>
+                    <th className="label text-left py-2 sm:py-3 px-2 sm:px-4">Year</th>
+                    <th className="label text-right py-2 sm:py-3 px-2 sm:px-4">Buy Net Worth</th>
+                    <th className="label text-right py-2 sm:py-3 px-2 sm:px-4">Rent Net Worth</th>
+                    <th className="label text-right py-2 sm:py-3 px-2 sm:px-4">Difference</th>
+                    <th className="label text-center py-2 sm:py-3 px-2 sm:px-4">Better</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -533,21 +533,21 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
                         key={buyYear.year}
                         className="border-b border-border-subtle hover:bg-bg-secondary transition-colors"
                       >
-                        <td className="py-3 px-4 font-mono text-text-primary">
+                        <td className="py-2 sm:py-3 px-2 sm:px-4 font-mono text-text-primary">
                           {buyYear.year}
                         </td>
-                        <td className="number-cell py-3 px-4 text-text-primary">
+                        <td className="number-cell py-2 sm:py-3 px-2 sm:px-4 text-text-primary">
                           {currency.format(buyYear.netWorth, false)}
                         </td>
-                        <td className="number-cell py-3 px-4 text-text-primary">
+                        <td className="number-cell py-2 sm:py-3 px-2 sm:px-4 text-text-primary">
                           {currency.format(rentYear.netWorth, false)}
                         </td>
-                        <td className={`number-cell py-3 px-4 font-semibold ${
+                        <td className={`number-cell py-2 sm:py-3 px-2 sm:px-4 font-semibold ${
                           diff > 0 ? 'text-success' : 'text-error'
                         }`}>
                           {currency.format(Math.abs(diff), false)}
                         </td>
-                        <td className="text-center py-3 px-4">
+                        <td className="text-center py-2 sm:py-3 px-2 sm:px-4">
                           <span className={`badge ${
                             isBuyBetterThisYear ? 'badge-primary' : 'border-accent-light text-accent-light'
                           }`}>

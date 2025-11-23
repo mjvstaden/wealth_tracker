@@ -26,10 +26,16 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
   const config = useRegionalConfig();
   const { currency } = config;
 
-  // Chart dimensions
-  const width = 800;
-  const height = 400;
-  const padding = { top: 20, right: 20, bottom: 50, left: 80 };
+  // Chart dimensions - responsive based on screen size
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+  const width = isMobile ? 600 : 800;
+  const height = isMobile ? 300 : 400;
+  const padding = {
+    top: 20,
+    right: isMobile ? 10 : 20,
+    bottom: isMobile ? 40 : 50,
+    left: isMobile ? 50 : 80
+  };
   const chartWidth = width - padding.left - padding.right;
   const chartHeight = height - padding.top - padding.bottom;
 
@@ -125,7 +131,7 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
         <svg
           viewBox={`0 0 ${width} ${height}`}
           className="w-full h-auto animate-fade-in-up"
-          style={{ minWidth: '600px' }}
+          style={{ minWidth: isMobile ? '500px' : '600px' }}
         >
           {/* Definitions for gradients */}
           <defs>
@@ -308,7 +314,7 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
 
       {/* Hover tooltip */}
       {hoveredYear !== null && (
-        <div className="absolute top-4 right-4 bg-bg-elevated border border-border-default rounded-md p-4 shadow-glow-blue animate-fade-in-up z-10">
+        <div className="absolute top-2 right-2 sm:top-4 sm:right-4 bg-bg-elevated border border-border-default rounded-md p-3 sm:p-4 shadow-glow-blue animate-fade-in-up z-10 max-w-[200px] sm:max-w-none">
           <div className="space-y-3">
             <div className="text-xs text-text-secondary uppercase tracking-wider">
               Year {hoveredYear}
@@ -320,7 +326,7 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
                 <div className="w-3 h-3 rounded-full bg-accent-primary" style={{ boxShadow: '0 0 8px rgba(14, 165, 233, 0.5)' }} />
                 <span className="text-xs text-text-secondary">Buy Net Worth</span>
               </div>
-              <div className="font-mono text-lg text-accent-primary font-semibold">
+              <div className="font-mono text-sm sm:text-lg text-accent-primary font-semibold">
                 {currency.format(getHoverData(hoveredYear).buyData?.netWorth || 0, false)}
               </div>
             </div>
@@ -331,7 +337,7 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#10b981', boxShadow: '0 0 8px rgba(16, 185, 129, 0.5)' }} />
                 <span className="text-xs text-text-secondary">Rent Net Worth</span>
               </div>
-              <div className="font-mono text-lg font-semibold" style={{ color: '#10b981' }}>
+              <div className="font-mono text-sm sm:text-lg font-semibold" style={{ color: '#10b981' }}>
                 {currency.format(getHoverData(hoveredYear).rentData?.netWorth || 0, false)}
               </div>
             </div>
@@ -358,14 +364,14 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
       )}
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-8 mt-6">
+      <div className="flex items-center justify-center gap-4 sm:gap-8 mt-4 sm:mt-6">
         <div className="flex items-center gap-2">
           <div className="w-4 h-1 bg-accent-primary rounded" style={{ boxShadow: '0 0 8px rgba(14, 165, 233, 0.5)' }} />
-          <span className="text-sm text-text-secondary">Buy Scenario</span>
+          <span className="text-xs sm:text-sm text-text-secondary">Buy Scenario</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-1 rounded" style={{ backgroundColor: '#10b981', boxShadow: '0 0 8px rgba(16, 185, 129, 0.5)' }} />
-          <span className="text-sm text-text-secondary">Rent Scenario</span>
+          <span className="text-xs sm:text-sm text-text-secondary">Rent Scenario</span>
         </div>
       </div>
     </div>

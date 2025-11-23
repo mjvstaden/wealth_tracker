@@ -26,10 +26,10 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full px-6 py-4 flex items-center justify-between bg-bg-secondary hover:bg-bg-elevated hover:border-accent-primary transition-all duration-300 group"
+        className="w-full px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between bg-bg-secondary hover:bg-bg-elevated hover:border-accent-primary transition-all duration-300 group"
       >
-        <div className="flex items-center gap-3">
-          <h3 className="font-display font-semibold text-base text-text-primary uppercase tracking-wider">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <h3 className="font-display font-semibold text-sm sm:text-base text-text-primary uppercase tracking-wider">
             {title}
           </h3>
           {badge && (
@@ -60,7 +60,7 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
           isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'
         }`}
       >
-        <div className="p-6 bg-bg-primary border-t border-border-subtle">
+        <div className="p-4 sm:p-6 bg-bg-primary border-t border-border-subtle">
           {children}
         </div>
       </div>

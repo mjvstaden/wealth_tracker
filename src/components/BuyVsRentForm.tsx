@@ -355,7 +355,7 @@ export const BuyVsRentForm: React.FC<BuyVsRentFormProps> = ({
                   (How many years to compare)
                 </span>
               </label>
-              <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
+              <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-2">
                 {[10, 15, 20, 25, 30, 35, 40].map((years) => (
                   <button
                     key={years}
@@ -364,7 +364,7 @@ export const BuyVsRentForm: React.FC<BuyVsRentFormProps> = ({
                       setTimeHorizonYears(years);
                       if (hasValidated) validateForm();
                     }}
-                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                    className={`px-3 sm:px-4 py-2 rounded-md text-sm font-medium transition-all ${
                       timeHorizonYears === years
                         ? 'bg-accent-primary text-bg-primary shadow-glow-blue'
                         : 'bg-bg-elevated text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'
@@ -386,7 +386,7 @@ export const BuyVsRentForm: React.FC<BuyVsRentFormProps> = ({
       <div className="flex justify-center pt-4">
         <button
           type="submit"
-          className="btn-primary px-12 py-4 text-base group relative overflow-hidden"
+          className="btn-primary px-8 sm:px-12 py-3 sm:py-4 text-sm sm:text-base group relative overflow-hidden w-full sm:w-auto"
         >
           <span className="relative z-10">Compare Scenarios</span>
 

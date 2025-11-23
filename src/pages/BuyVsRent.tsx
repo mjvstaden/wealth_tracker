@@ -44,22 +44,22 @@ const BuyVsRent: React.FC = () => {
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       {/* Header */}
-      <div className="mb-8 opacity-0 animate-fade-in-up">
-        <div className="flex items-center justify-between mb-4">
+      <div className="mb-6 sm:mb-8 opacity-0 animate-fade-in-up">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-4">
           <Link
             to="/"
-            className="inline-flex items-center text-text-secondary hover:text-accent-primary transition-colors"
+            className="inline-flex items-center text-text-secondary hover:text-accent-primary transition-colors text-sm sm:text-base"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Home
           </Link>
           <RegionSelector />
         </div>
-        <h1 className="text-4xl font-bold text-text-primary mb-3">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary mb-3">
           Buy vs Rent Analysis
-          <span className="text-accent-primary ml-3">({config.name})</span>
+          <span className="text-accent-primary ml-2 sm:ml-3 text-xl sm:text-2xl md:text-3xl">({config.name})</span>
         </h1>
-        <p className="text-lg text-text-secondary max-w-3xl">
+        <p className="text-sm sm:text-base md:text-lg text-text-secondary max-w-3xl">
           Compare the financial impact of buying a home versus renting and investing the difference.
           All values in <span className="font-semibold text-text-primary">{config.currency.code}</span>.
         </p>
@@ -72,14 +72,14 @@ const BuyVsRent: React.FC = () => {
 
       {/* Results Section */}
       {showResults && results && inputs && (
-        <div id="results" className="mt-12 opacity-0 animate-fade-in-up stagger-2">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold text-text-primary">
+        <div id="results" className="mt-8 sm:mt-12 opacity-0 animate-fade-in-up stagger-2">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-6">
+            <h2 className="text-xl sm:text-2xl font-semibold text-text-primary">
               Comparison Results
             </h2>
             <button
               onClick={handleReset}
-              className="btn-secondary"
+              className="btn-secondary text-sm sm:text-base"
             >
               New Comparison
             </button>
@@ -90,12 +90,12 @@ const BuyVsRent: React.FC = () => {
 
       {/* Empty State - Show when no results yet */}
       {!showResults && (
-        <div className="mt-12 text-center opacity-0 animate-fade-in-up stagger-2">
-          <div className="bg-bg-secondary border border-border-default rounded-md p-12">
-            <h3 className="text-xl font-semibold text-text-primary mb-2">
+        <div className="mt-8 sm:mt-12 text-center opacity-0 animate-fade-in-up stagger-2">
+          <div className="bg-bg-secondary border border-border-default rounded-md p-6 sm:p-12">
+            <h3 className="text-lg sm:text-xl font-semibold text-text-primary mb-2">
               Ready to Compare?
             </h3>
-            <p className="text-text-secondary">
+            <p className="text-sm sm:text-base text-text-secondary">
               Fill out the form above and click "Compare Scenarios" to see your results.
             </p>
           </div>
