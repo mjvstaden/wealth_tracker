@@ -1,10 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Auth0Provider } from '@auth0/auth0-react';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-import { auth0Config } from './auth/auth0-config';
+import { RegionalProvider } from './contexts/RegionalContext';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -12,9 +11,9 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <Auth0Provider {...auth0Config}>
+    <RegionalProvider defaultRegion="ZA">
       <App />
-    </Auth0Provider>
+    </RegionalProvider>
   </React.StrictMode>
 );
 
