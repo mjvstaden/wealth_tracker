@@ -482,48 +482,47 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
       </div>
 
       {/* Year-by-Year Breakdown Table */}
-      <div className="card overflow-hidden">
-        <div className="space-y-0">
-          {/* Header with toggle */}
-          <button
-            onClick={() => setShowBreakdown(!showBreakdown)}
-            className="w-full flex items-center justify-between group px-4 py-4 sm:py-6"
-          >
-            <h3 className="font-display text-base sm:text-lg md:text-xl font-semibold text-text-primary uppercase tracking-wider">
-              Year-by-Year Breakdown
-            </h3>
+      <div className="bg-bg-secondary border border-border-default rounded-md overflow-hidden">
+        {/* Header with toggle */}
+        <button
+          onClick={() => setShowBreakdown(!showBreakdown)}
+          className="w-full flex items-center justify-between group p-6"
+        >
+          <h3 className="font-display text-base sm:text-lg md:text-xl font-semibold text-text-primary uppercase tracking-wider">
+            Year-by-Year Breakdown
+          </h3>
 
-            <div className="flex items-center gap-2 sm:gap-3">
-              <span className="text-xs sm:text-sm text-text-secondary group-hover:text-accent-primary transition-colors">
-                {showBreakdown ? 'Hide Details' : 'Show Details'}
-              </span>
-              <svg
-                className={`w-5 h-5 text-text-secondary group-hover:text-accent-primary transition-all duration-300 ${
-                  showBreakdown ? 'rotate-180' : ''
-                }`}
-                fill="none"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          </button>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <span className="text-xs sm:text-sm text-text-secondary group-hover:text-accent-primary transition-colors">
+              {showBreakdown ? 'Hide Details' : 'Show Details'}
+            </span>
+            <svg
+              className={`w-5 h-5 text-text-secondary group-hover:text-accent-primary transition-all duration-300 ${
+                showBreakdown ? 'rotate-180' : ''
+              }`}
+              fill="none"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </button>
 
-          {/* Table */}
-          {showBreakdown && (
-            <div className="w-full overflow-x-auto animate-fade-in-up border-t border-border-subtle">
-              <table className="w-full text-xs sm:text-sm" style={{ minWidth: '500px' }}>
-                <thead>
+        {/* Table - Outside padding context */}
+        {showBreakdown && (
+          <div className="w-full overflow-x-auto animate-fade-in-up border-t border-border-subtle">
+            <table className="w-full text-xs">
+              <thead>
                   <tr className="border-b border-border-default">
-                    <th className="label text-left py-2 sm:py-3 px-2 sm:px-4">Year</th>
-                    <th className="label text-right py-2 sm:py-3 px-2 sm:px-4">Buy Net Worth</th>
-                    <th className="label text-right py-2 sm:py-3 px-2 sm:px-4">Rent Net Worth</th>
-                    <th className="label text-right py-2 sm:py-3 px-2 sm:px-4">Difference</th>
-                    <th className="label text-center py-2 sm:py-3 px-2 sm:px-4">Better</th>
+                    <th className="label text-left py-2 px-1 sm:px-4">Yr</th>
+                    <th className="label text-right py-2 px-1 sm:px-4">Buy</th>
+                    <th className="label text-right py-2 px-1 sm:px-4">Rent</th>
+                    <th className="label text-right py-2 px-1 sm:px-4">Diff</th>
+                    <th className="label text-center py-2 px-1 sm:px-4">Winner</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -537,23 +536,23 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
                         key={buyYear.year}
                         className="border-b border-border-subtle hover:bg-bg-secondary transition-colors"
                       >
-                        <td className="py-2 sm:py-3 px-2 sm:px-4 font-mono text-text-primary">
+                        <td className="py-2 px-1 sm:px-4 font-mono text-text-primary">
                           {buyYear.year}
                         </td>
-                        <td className="number-cell py-2 sm:py-3 px-2 sm:px-4 text-text-primary">
-                          {currency.format(buyYear.netWorth, false)}
+                        <td className="number-cell py-2 px-1 sm:px-4 text-text-primary text-xs">
+                          {currency.format(buyYear.netWorth, true)}
                         </td>
-                        <td className="number-cell py-2 sm:py-3 px-2 sm:px-4 text-text-primary">
-                          {currency.format(rentYear.netWorth, false)}
+                        <td className="number-cell py-2 px-1 sm:px-4 text-text-primary text-xs">
+                          {currency.format(rentYear.netWorth, true)}
                         </td>
-                        <td className={`number-cell py-2 sm:py-3 px-2 sm:px-4 font-semibold ${
+                        <td className={`number-cell py-2 px-1 sm:px-4 font-semibold text-xs ${
                           diff > 0 ? 'text-success' : 'text-error'
                         }`}>
-                          {currency.format(Math.abs(diff), false)}
+                          {currency.format(Math.abs(diff), true)}
                         </td>
-                        <td className="text-center py-2 sm:py-3 px-2 sm:px-4">
-                          <span className={`badge ${
-                            isBuyBetterThisYear ? 'badge-primary' : 'border-accent-light text-accent-light'
+                        <td className="text-center py-2 px-1 sm:px-4">
+                          <span className={`text-xs font-medium ${
+                            isBuyBetterThisYear ? 'text-accent-primary' : 'text-accent-light'
                           }`}>
                             {isBuyBetterThisYear ? 'Buy' : 'Rent'}
                           </span>
@@ -562,10 +561,9 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
                     );
                   })}
                 </tbody>
-              </table>
-            </div>
-          )}
-        </div>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
