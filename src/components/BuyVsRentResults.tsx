@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { BuyVsRentResults } from '../types';
+import { BuyVsRentResults, BuyVsRentInputs } from '../types';
 import { formatPercentage } from '../lib/formatters';
 import { useRegionalConfig } from '../contexts/RegionalContext';
 import { NetWorthChart } from './NetWorthChart';
 
 interface BuyVsRentResultsProps {
   results: BuyVsRentResults;
+  inputs: BuyVsRentInputs;
   className?: string;
 }
 
@@ -20,6 +21,7 @@ interface BuyVsRentResultsProps {
  */
 export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
   results,
+  inputs,
   className = '',
 }) => {
   const [showBreakdown, setShowBreakdown] = useState(false);
@@ -28,11 +30,81 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
 
   const betterChoice = results.betterChoice;
   const isBuyBetter = betterChoice === 'buy';
+  const timeHorizon = inputs.timeHorizonYears;
 
   // Key metrics
   const totalDifference = Math.abs(results.difference);
   const percentageDifference =
     ((totalDifference / Math.max(results.finalBuyNetWorth, results.finalRentNetWorth)) * 100);
+
+  // Calculate one-time costs
+  const downPayment = inputs.buyInputs.homePrice * (inputs.buyInputs.downPaymentPercent / 100);
+  const closingCosts = inputs.buyInputs.homePrice * (inputs.buyInputs.closingCostsPercent / 100);
+
+  // Calculate total ongoing costs for buying (sum across all years)
+  const totalMortgagePayments = results.buyBreakdown.reduce((sum, year) => sum + year.yearlyMortgagePayment, 0);
+  const totalPropertyTax = results.buyBreakdown.reduce((sum, year) => sum + year.yearlyPropertyTax, 0);
+  const totalInsurance = results.buyBreakdown.reduce((sum, year) => sum + year.yearlyInsurance, 0);
+  const totalHOA = results.buyBreakdown.reduce((sum, year) => sum + year.yearlyHOA, 0);
+  const totalMaintenance = results.buyBreakdown.reduce((sum, year) => sum + year.yearlyMaintenance, 0);
+  const totalBuyingCosts = totalMortgagePayments + totalPropertyTax + totalInsurance + totalHOA + totalMaintenance;
+
+  // Calculate next year costs (after mortgage is paid off)
+  // Home value in next year with one more year of appreciation
+  const finalYearData = results.buyBreakdown[results.buyBreakdown.length - 1];
+  const nextYearHomeValue = finalYearData.homeValue * (1 + inputs.buyInputs.appreciationRate / 100);
+
+  // Property tax and maintenance are based on home value
+  const nextYearPropertyTax = (nextYearHomeValue * inputs.buyInputs.propertyTaxRate / 100) / 12;
+  const nextYearMaintenance = (nextYearHomeValue * inputs.buyInputs.maintenanceRate / 100) / 12;
+
+  // Insurance and HOA stay the same (or we could apply inflation, but keeping simple)
+  const nextYearInsurance = inputs.buyInputs.homeInsurance / 12;
+  const nextYearHOA = inputs.buyInputs.hoaFees;
+
+  const nextYearTotalMonthly = nextYearPropertyTax + nextYearInsurance + nextYearHOA + nextYearMaintenance;
+
+  // Calculate renter totals
+  const totalRentPaid = results.rentBreakdown.reduce((sum, year) => sum + year.yearlyRent, 0);
+  const renterInitialInvestment = downPayment;
+
+  // Calculate total investment contributions (sum of monthly savings over 20 years)
+  // For each year: contributions = (buy costs - rent costs) invested
+  let totalInvestmentContributions = 0;
+  for (let i = 0; i < results.buyBreakdown.length; i++) {
+    const buyYear = results.buyBreakdown[i];
+    const rentYear = results.rentBreakdown[i];
+
+    if (buyYear.year === 0) {
+      // Year 0: no contributions, just initial investment
+      continue;
+    }
+
+    // Calculate buy costs for comparison (excluding principal payments which build equity)
+    let buyCostsForYear = buyYear.yearlyMortgagePayment + buyYear.yearlyPropertyTax +
+                          buyYear.yearlyInsurance + buyYear.yearlyHOA + buyYear.yearlyMaintenance;
+
+    // For year 1, the calculation already excluded down payment and closing costs in the loop
+    // but we need to match what was actually used in the investment calculation
+    if (buyYear.year === 1) {
+      // Year 1: buy costs don't include down payment/closing costs (those are in year 0)
+      // The costs are already correct from the breakdown
+      buyCostsForYear = buyYear.totalYearlyCost - downPayment - closingCosts;
+    }
+
+    const rentCostsForYear = rentYear.yearlyRent + rentYear.yearlyRentersInsurance;
+    const yearlyContribution = Math.max(0, buyCostsForYear - rentCostsForYear);
+    totalInvestmentContributions += yearlyContribution;
+  }
+
+  // Calculate investment totals
+  const totalInvestmentBalance = results.rentBreakdown[results.rentBreakdown.length - 1].investmentBalance;
+  const totalMoneyInvested = renterInitialInvestment + totalInvestmentContributions;
+  const totalInvestmentGrowth = totalInvestmentBalance - totalMoneyInvested;
+
+  // Calculate next year rent (after time horizon years of increases)
+  const finalMonthlyRent = results.rentBreakdown[results.rentBreakdown.length - 1].monthlyRent;
+  const nextYearMonthlyRent = finalMonthlyRent * (1 + inputs.rentInputs.rentIncreaseRate / 100);
 
   return (
     <div className={`space-y-12 ${className}`}>
@@ -123,145 +195,271 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
         </div>
       </div>
 
-      {/* Side-by-Side Comparison Cards */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Buy Scenario Card */}
-        <div className="opacity-0 animate-slide-in-left">
-          <div className={`card card-sweep h-full ${
-            isBuyBetter ? 'border-accent-primary shadow-glow-blue' : ''
-          }`}>
-            <div className="space-y-6">
-              {/* Header */}
-              <div className="flex items-center justify-between">
-                <h3 className="font-display text-xl font-semibold text-text-primary uppercase tracking-wider">
-                  Buy Scenario
-                </h3>
-                {isBuyBetter && (
-                  <span className="badge badge-success">Winner</span>
-                )}
+      {/* Side-by-Side Comparison - Single Card */}
+      <div className="card opacity-0 animate-fade-in-up stagger-2">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 divide-y lg:divide-y-0 lg:divide-x divide-border-default">
+
+          {/* BUY SCENARIO */}
+          <div className="space-y-6 pt-6 lg:pt-0">
+            <div className="flex items-center justify-between">
+              <h3 className="font-display text-2xl font-semibold text-text-primary uppercase tracking-wider">
+                Buying
+              </h3>
+              {isBuyBetter && (
+                <span className="badge badge-success">Winner</span>
+              )}
+            </div>
+
+            {/* One-Time Costs */}
+            <div className="space-y-3">
+              <div className="label text-accent-primary uppercase tracking-wider text-xs">One-Time Costs</div>
+              <div className="bg-bg-elevated rounded-md p-4 space-y-2">
+                <div className="flex justify-between items-baseline text-sm">
+                  <span className="text-text-secondary">Down Payment</span>
+                  <span className="font-mono text-text-primary">
+                    {currency.format(downPayment, false)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-baseline text-sm">
+                  <span className="text-text-secondary">Closing Costs</span>
+                  <span className="font-mono text-text-primary">
+                    {currency.format(closingCosts, false)}
+                  </span>
+                </div>
               </div>
+            </div>
 
-              {/* Final numbers */}
-              <div className="space-y-4 pt-4 border-t border-border-subtle">
-                <div className="flex justify-between items-baseline">
-                  <span className="label">Final Home Value</span>
-                  <span className="font-mono text-lg text-text-primary">
-                    {currency.format(
-                      results.buyBreakdown[results.buyBreakdown.length - 1].homeValue, false
-                    )}
+            {/* Monthly Costs After Mortgage Paid Off */}
+            <div className="space-y-3">
+              <div className="label text-accent-primary uppercase tracking-wider text-xs">Monthly Costs (After Paid Off)</div>
+              <div className="bg-bg-elevated rounded-md p-4 space-y-2">
+                <div className="flex justify-between items-baseline text-sm">
+                  <span className="text-text-secondary">Mortgage Payment</span>
+                  <span className="font-mono text-success">
+                    {currency.format(0, false)}
                   </span>
                 </div>
-
-                <div className="flex justify-between items-baseline">
-                  <span className="label">Mortgage Balance</span>
-                  <span className="font-mono text-lg text-text-primary">
-                    {currency.format(
-                      results.buyBreakdown[results.buyBreakdown.length - 1].mortgageBalance, false
-                    )}
+                <div className="flex justify-between items-baseline text-sm">
+                  <span className="text-text-secondary">Property Tax</span>
+                  <span className="font-mono text-text-primary">
+                    {currency.format(nextYearPropertyTax, false)}
                   </span>
                 </div>
-
-                <div className="flex justify-between items-baseline">
-                  <span className="label">Total Equity</span>
-                  <span className="font-mono text-lg text-accent-primary font-semibold">
-                    {currency.format(
-                      results.buyBreakdown[results.buyBreakdown.length - 1].equity, false
-                    )}
+                <div className="flex justify-between items-baseline text-sm">
+                  <span className="text-text-secondary">Insurance</span>
+                  <span className="font-mono text-text-primary">
+                    {currency.format(nextYearInsurance, false)}
                   </span>
                 </div>
-
-                <div className="flex justify-between items-baseline">
-                  <span className="label">Total Costs Paid</span>
-                  <span className="font-mono text-lg text-text-secondary">
-                    {currency.format(
-                      results.buyBreakdown[results.buyBreakdown.length - 1].cumulativeCosts, false
-                    )}
-                  </span>
-                </div>
-
-                <div className="pt-4 border-t border-border-accent">
-                  <div className="flex justify-between items-baseline">
-                    <span className="label text-accent-primary">Final Net Worth</span>
-                    <span className={`font-mono text-2xl font-bold ${
-                      isBuyBetter ? 'text-accent-primary' : 'text-text-primary'
-                    }`}>
-                      {currency.format(results.finalBuyNetWorth, false)}
+                {nextYearHOA > 0 && (
+                  <div className="flex justify-between items-baseline text-sm">
+                    <span className="text-text-secondary">HOA/Levies</span>
+                    <span className="font-mono text-text-primary">
+                      {currency.format(nextYearHOA, false)}
                     </span>
                   </div>
+                )}
+                <div className="flex justify-between items-baseline text-sm">
+                  <span className="text-text-secondary">Maintenance</span>
+                  <span className="font-mono text-text-primary">
+                    {currency.format(nextYearMaintenance, false)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-baseline text-sm pt-2 border-t border-border-subtle font-semibold">
+                  <span className="text-text-primary">Total Monthly</span>
+                  <span className="font-mono text-text-primary">
+                    {currency.format(nextYearTotalMonthly, false)}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Total Costs Over Time Horizon */}
+            <div className="space-y-3">
+              <div className="label text-accent-primary uppercase tracking-wider text-xs">Total Costs ({timeHorizon} Years)</div>
+              <div className="bg-bg-elevated rounded-md p-4 space-y-2">
+                <div className="flex justify-between items-baseline text-sm">
+                  <span className="text-text-secondary">Mortgage Payments</span>
+                  <span className="font-mono text-text-primary">
+                    {currency.format(totalMortgagePayments, false)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-baseline text-sm">
+                  <span className="text-text-secondary">Property Tax</span>
+                  <span className="font-mono text-text-primary">
+                    {currency.format(totalPropertyTax, false)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-baseline text-sm">
+                  <span className="text-text-secondary">Insurance</span>
+                  <span className="font-mono text-text-primary">
+                    {currency.format(totalInsurance, false)}
+                  </span>
+                </div>
+                {totalHOA > 0 && (
+                  <div className="flex justify-between items-baseline text-sm">
+                    <span className="text-text-secondary">HOA/Levies</span>
+                    <span className="font-mono text-text-primary">
+                      {currency.format(totalHOA, false)}
+                    </span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline text-sm">
+                  <span className="text-text-secondary">Maintenance</span>
+                  <span className="font-mono text-text-primary">
+                    {currency.format(totalMaintenance, false)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-baseline text-sm pt-2 border-t border-border-subtle font-semibold">
+                  <span className="text-text-primary">Total Paid</span>
+                  <span className="font-mono text-text-primary">
+                    {currency.format(totalBuyingCosts, false)}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Final Position */}
+            <div className="space-y-3 pt-4 border-t border-border-accent">
+              <div className="label text-accent-primary uppercase tracking-wider text-xs">Final Position</div>
+              <div className="bg-bg-elevated rounded-md p-4 space-y-2">
+                <div className="flex justify-between items-baseline text-sm">
+                  <span className="text-text-secondary">Home Value</span>
+                  <span className="font-mono text-text-primary">
+                    {currency.format(results.buyBreakdown[results.buyBreakdown.length - 1].homeValue, false)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-baseline text-sm">
+                  <span className="text-text-secondary">Mortgage Balance</span>
+                  <span className="font-mono text-text-primary">
+                    {currency.format(results.buyBreakdown[results.buyBreakdown.length - 1].mortgageBalance, false)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-baseline text-sm">
+                  <span className="text-text-secondary">Home Equity</span>
+                  <span className="font-mono text-text-primary">
+                    {currency.format(results.buyBreakdown[results.buyBreakdown.length - 1].equity, false)}
+                  </span>
+                </div>
+                {results.buyBreakdown[results.buyBreakdown.length - 1].investmentBalance > 0 && (
+                  <div className="flex justify-between items-baseline text-sm">
+                    <span className="text-text-secondary">Investment Balance</span>
+                    <span className="font-mono text-success">
+                      {currency.format(results.buyBreakdown[results.buyBreakdown.length - 1].investmentBalance, false)}
+                    </span>
+                  </div>
+                )}
+                <div className="flex justify-between items-baseline text-sm pt-2 border-t border-border-subtle font-semibold">
+                  <span className="text-accent-primary">NET WORTH</span>
+                  <span className={`font-mono text-2xl font-bold ${
+                    isBuyBetter ? 'text-accent-primary' : 'text-text-primary'
+                  }`}>
+                    {currency.format(results.finalBuyNetWorth, true)}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Rent Scenario Card */}
-        <div className="opacity-0 animate-slide-in-right">
-          <div className={`card card-sweep h-full ${
-            !isBuyBetter ? 'border-accent-light shadow-glow-blue' : ''
-          }`}>
-            <div className="space-y-6">
-              {/* Header */}
-              <div className="flex items-center justify-between">
-                <h3 className="font-display text-xl font-semibold text-text-primary uppercase tracking-wider">
-                  Rent Scenario
-                </h3>
-                {!isBuyBetter && (
-                  <span className="badge badge-success">Winner</span>
-                )}
+          {/* RENT SCENARIO */}
+          <div className="space-y-6 pt-6 lg:pt-0 lg:pl-12">
+            <div className="flex items-center justify-between">
+              <h3 className="font-display text-2xl font-semibold text-text-primary uppercase tracking-wider">
+                Renting
+              </h3>
+              {!isBuyBetter && (
+                <span className="badge badge-success">Winner</span>
+              )}
+            </div>
+
+            {/* One-Time Costs */}
+            <div className="space-y-3">
+              <div className="label text-accent-light uppercase tracking-wider text-xs">Initial Investment</div>
+              <div className="bg-bg-elevated rounded-md p-4 space-y-2">
+                <div className="flex justify-between items-baseline text-sm">
+                  <span className="text-text-secondary">Down Payment Saved</span>
+                  <span className="font-mono text-text-primary">
+                    {currency.format(renterInitialInvestment, false)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-baseline text-sm text-text-tertiary">
+                  <span className="text-xs italic">Invested immediately instead of buying</span>
+                </div>
               </div>
+            </div>
 
-              {/* Final numbers */}
-              <div className="space-y-4 pt-4 border-t border-border-subtle">
-                <div className="flex justify-between items-baseline">
-                  <span className="label">Final Monthly Rent</span>
-                  <span className="font-mono text-lg text-text-primary">
-                    {currency.format(
-                      results.rentBreakdown[results.rentBreakdown.length - 1].monthlyRent, false
-                    )}
+            {/* Monthly Costs After Time Horizon */}
+            <div className="space-y-3">
+              <div className="label text-accent-light uppercase tracking-wider text-xs">Monthly Cost (Year {timeHorizon + 1})</div>
+              <div className="bg-bg-elevated rounded-md p-4 space-y-2">
+                <div className="flex justify-between items-baseline text-sm">
+                  <span className="text-text-secondary">Monthly Rent</span>
+                  <span className="font-mono text-text-primary">
+                    {currency.format(nextYearMonthlyRent, false)}
                   </span>
                 </div>
-
-                <div className="flex justify-between items-baseline">
-                  <span className="label">Total Rent Paid</span>
-                  <span className="font-mono text-lg text-text-secondary">
-                    {currency.format(
-                      results.rentBreakdown[results.rentBreakdown.length - 1].cumulativeCosts, false
-                    )}
+                <div className="flex justify-between items-baseline text-sm pt-2 border-t border-border-subtle font-semibold">
+                  <span className="text-text-primary">Total Monthly</span>
+                  <span className="font-mono text-text-primary">
+                    {currency.format(nextYearMonthlyRent, false)}
                   </span>
                 </div>
+              </div>
+            </div>
 
-                <div className="flex justify-between items-baseline">
-                  <span className="label">Investment Balance</span>
-                  <span className="font-mono text-lg text-accent-light font-semibold">
-                    {currency.format(
-                      results.rentBreakdown[results.rentBreakdown.length - 1].investmentBalance, false
-                    )}
+            {/* Total Rent Paid */}
+            <div className="space-y-3">
+              <div className="label text-accent-light uppercase tracking-wider text-xs">Total Rent ({timeHorizon} Years)</div>
+              <div className="bg-bg-elevated rounded-md p-4 space-y-2">
+                <div className="flex justify-between items-baseline text-sm">
+                  <span className="text-text-secondary">Total Rent Paid</span>
+                  <span className="font-mono text-text-primary">
+                    {currency.format(totalRentPaid, false)}
                   </span>
                 </div>
+              </div>
+            </div>
 
-                <div className="flex justify-between items-baseline">
-                  <span className="label">Estimated Growth</span>
-                  <span className="font-mono text-lg text-success">
-                    {currency.format(
-                      results.rentBreakdown[results.rentBreakdown.length - 1].investmentBalance -
-                      results.rentBreakdown[results.rentBreakdown.length - 1].cumulativeCosts, false
-                    )}
+            {/* Final Position */}
+            <div className="space-y-3 pt-4 border-t border-border-accent">
+              <div className="label text-accent-light uppercase tracking-wider text-xs">Final Position</div>
+              <div className="bg-bg-elevated rounded-md p-4 space-y-2">
+                <div className="flex justify-between items-baseline text-sm">
+                  <span className="text-text-secondary">Initial Investment</span>
+                  <span className="font-mono text-text-primary">
+                    {currency.format(renterInitialInvestment, false)}
                   </span>
                 </div>
-
-                <div className="pt-4 border-t border-border-accent">
-                  <div className="flex justify-between items-baseline">
-                    <span className="label text-accent-light">Final Net Worth</span>
-                    <span className={`font-mono text-2xl font-bold ${
-                      !isBuyBetter ? 'text-accent-light' : 'text-text-primary'
-                    }`}>
-                      {currency.format(results.finalRentNetWorth, false)}
-                    </span>
-                  </div>
+                <div className="flex justify-between items-baseline text-sm">
+                  <span className="text-text-secondary">Monthly Contributions</span>
+                  <span className="font-mono text-text-primary">
+                    {currency.format(totalInvestmentContributions, false)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-baseline text-sm">
+                  <span className="text-text-secondary">Investment Growth</span>
+                  <span className="font-mono text-success">
+                    {currency.format(totalInvestmentGrowth, false)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-baseline text-sm">
+                  <span className="text-text-secondary">Total Investment Value</span>
+                  <span className="font-mono text-text-primary">
+                    {currency.format(totalInvestmentBalance, false)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-baseline text-sm pt-2 border-t border-border-subtle font-semibold">
+                  <span className="text-accent-light">NET WORTH</span>
+                  <span className={`font-mono text-2xl font-bold ${
+                    !isBuyBetter ? 'text-accent-light' : 'text-text-primary'
+                  }`}>
+                    {currency.format(results.finalRentNetWorth, true)}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
+
         </div>
       </div>
 

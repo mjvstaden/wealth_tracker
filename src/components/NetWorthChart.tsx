@@ -135,10 +135,10 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
               <stop offset="100%" stopColor="#0ea5e9" stopOpacity="0" />
             </linearGradient>
 
-            {/* Light blue gradient */}
+            {/* Green gradient */}
             <linearGradient id="rentGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.3" />
-              <stop offset="100%" stopColor="#38bdf8" stopOpacity="0" />
+              <stop offset="0%" stopColor="#10b981" stopOpacity="0.3" />
+              <stop offset="100%" stopColor="#10b981" stopOpacity="0" />
             </linearGradient>
           </defs>
 
@@ -188,13 +188,13 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
             <path
               d={rentPath}
               fill="none"
-              stroke="#38bdf8"
+              stroke="#10b981"
               strokeWidth="3"
               strokeLinecap="round"
               strokeLinejoin="round"
               className="transition-all duration-300 hover:stroke-width-4"
               style={{
-                filter: 'drop-shadow(0 0 8px rgba(56, 189, 248, 0.5))',
+                filter: 'drop-shadow(0 0 8px rgba(16, 185, 129, 0.5))',
               }}
             />
 
@@ -221,12 +221,12 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
                 cx={scaleX(point.year)}
                 cy={scaleY(point.netWorth)}
                 r={hoveredYear === point.year ? 6 : 4}
-                fill="#38bdf8"
+                fill="#10b981"
                 className="cursor-pointer transition-all duration-200"
                 onMouseEnter={() => setHoveredYear(point.year)}
                 onMouseLeave={() => setHoveredYear(null)}
                 style={{
-                  filter: hoveredYear === point.year ? 'drop-shadow(0 0 8px rgba(56, 189, 248, 0.8))' : 'none',
+                  filter: hoveredYear === point.year ? 'drop-shadow(0 0 8px rgba(16, 185, 129, 0.8))' : 'none',
                 }}
               />
             ))}
@@ -328,10 +328,10 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
             {/* Rent data */}
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-accent-light" style={{ boxShadow: '0 0 8px rgba(56, 189, 248, 0.5)' }} />
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#10b981', boxShadow: '0 0 8px rgba(16, 185, 129, 0.5)' }} />
                 <span className="text-xs text-text-secondary">Rent Net Worth</span>
               </div>
-              <div className="font-mono text-lg text-accent-light font-semibold">
+              <div className="font-mono text-lg font-semibold" style={{ color: '#10b981' }}>
                 {currency.format(getHoverData(hoveredYear).rentData?.netWorth || 0, false)}
               </div>
             </div>
@@ -364,7 +364,7 @@ export const NetWorthChart: React.FC<NetWorthChartProps> = ({
           <span className="text-sm text-text-secondary">Buy Scenario</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-4 h-1 bg-accent-light rounded" style={{ boxShadow: '0 0 8px rgba(56, 189, 248, 0.5)' }} />
+          <div className="w-4 h-1 rounded" style={{ backgroundColor: '#10b981', boxShadow: '0 0 8px rgba(16, 185, 129, 0.5)' }} />
           <span className="text-sm text-text-secondary">Rent Scenario</span>
         </div>
       </div>

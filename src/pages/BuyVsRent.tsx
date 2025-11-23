@@ -15,12 +15,14 @@ import { useRegional } from '../contexts/RegionalContext';
 const BuyVsRent: React.FC = () => {
   const { config } = useRegional();
   const [results, setResults] = useState<BuyVsRentResults | null>(null);
+  const [inputs, setInputs] = useState<BuyVsRentInputs | null>(null);
   const [showResults, setShowResults] = useState(false);
 
-  const handleCalculate = (inputs: BuyVsRentInputs) => {
+  const handleCalculate = (calculationInputs: BuyVsRentInputs) => {
     // Run the comparison calculation
-    const calculationResults = compareBuyVsRent(inputs);
+    const calculationResults = compareBuyVsRent(calculationInputs);
     setResults(calculationResults);
+    setInputs(calculationInputs);
     setShowResults(true);
 
     // Scroll to results
@@ -35,6 +37,7 @@ const BuyVsRent: React.FC = () => {
   const handleReset = () => {
     setShowResults(false);
     setResults(null);
+    setInputs(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -68,7 +71,7 @@ const BuyVsRent: React.FC = () => {
       </div>
 
       {/* Results Section */}
-      {showResults && results && (
+      {showResults && results && inputs && (
         <div id="results" className="mt-12 opacity-0 animate-fade-in-up stagger-2">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-semibold text-text-primary">
@@ -81,7 +84,7 @@ const BuyVsRent: React.FC = () => {
               New Comparison
             </button>
           </div>
-          <BuyVsRentResultsDisplay results={results} />
+          <BuyVsRentResultsDisplay results={results} inputs={inputs} />
         </div>
       )}
 

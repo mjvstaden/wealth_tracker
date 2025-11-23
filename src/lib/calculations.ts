@@ -439,100 +439,161 @@ export function compareBuyVsRent(inputs: BuyVsRentInputs): BuyVsRentResults {
 
   let buyCumulativeCosts = 0;
   let rentCumulativeCosts = 0;
-  let previousBuyMonthlyCost = 0;
-  let previousRentMonthlyCost = 0;
+  let buyInvestmentBalance = 0; // Buyer's investment balance after mortgage is paid off
 
-  // Year-by-year breakdown
-  for (let year = 0; year < inputs.timeHorizonYears; year++) {
-    // Calculate current home value with appreciation
-    const currentHomeValue = inputs.buyInputs.homePrice * Math.pow(1 + inputs.buyInputs.appreciationRate / 100, year);
+  // Calculate when mortgage is paid off
+  const mortgageTermYears = inputs.buyInputs.loanTermYears;
+  const monthlyMortgagePayment = calculateMonthlyMortgage(
+    inputs.buyInputs.homePrice - downPayment,
+    inputs.buyInputs.interestRate,
+    mortgageTermYears
+  );
 
-    // BUY SCENARIO
-    const buyCosts = calculateBuyingCosts(inputs.buyInputs, year, currentHomeValue);
-
-    // Track cumulative costs for display purposes
-    buyCumulativeCosts += buyCosts.totalCostExcludingPrincipal;
-
-    const equity = calculateHomeEquity(inputs.buyInputs, year, currentHomeValue);
-
-    // Net Worth = Assets - Liabilities
-    // For buyer: Assets = Equity (Home Value - Mortgage Balance), Liabilities = 0
-    const buyNetWorth = equity;
-
-    buyBreakdown.push({
-      year: year + 1,
-      homeValue: Math.round(currentHomeValue * 100) / 100,
-      mortgageBalance: Math.round((currentHomeValue - equity) * 100) / 100,
-      equity: Math.round(equity * 100) / 100,
-      yearlyMortgagePayment: buyCosts.mortgagePayment,
-      yearlyPropertyTax: buyCosts.propertyTax,
-      yearlyInsurance: buyCosts.insurance,
-      yearlyHOA: buyCosts.hoa,
-      yearlyMaintenance: buyCosts.maintenance,
-      totalYearlyCost: buyCosts.totalCost,
-      cumulativeCosts: Math.round(buyCumulativeCosts * 100) / 100,
-      netWorth: Math.round(buyNetWorth * 100) / 100,
-    });
-
-    // RENT SCENARIO
-    const rentCosts = calculateRentingCosts(inputs.rentInputs, year);
-    rentCumulativeCosts += rentCosts.totalCost;
-
-    // Calculate monthly investment
-    // First year: invest down payment upfront, then monthly difference
-    // Subsequent years: invest monthly difference
-    let investmentBalance: number;
-
+  // Year-by-year breakdown (starting from year 0)
+  for (let year = 0; year <= inputs.timeHorizonYears; year++) {
     if (year === 0) {
-      // First year: down payment invested at start + monthly savings throughout year
-      // Note: Renters invest the down payment they saved, NOT closing costs
-      // IMPORTANT: Compare actual monthly costs (excluding principal, which builds equity)
-      const buyMonthlyCost = buyCosts.totalCostExcludingPrincipal / 12;
-      const rentMonthlyCost = rentCosts.totalCost / 12;
-      const monthlySavings = Math.max(0, buyMonthlyCost - rentMonthlyCost);
+      // Year 0 - Initial state at moment of purchase/decision
+      const initialHomeValue = inputs.buyInputs.homePrice;
+      const initialMortgageBalance = inputs.buyInputs.homePrice - downPayment;
+      const initialEquity = downPayment;
 
-      investmentBalance = calculateInvestmentGrowth(
-        renterInitialInvestment,
-        monthlySavings,
-        inputs.investmentReturnRate,
-        1
-      );
+      buyBreakdown.push({
+        year: 0,
+        homeValue: Math.round(initialHomeValue * 100) / 100,
+        mortgageBalance: Math.round(initialMortgageBalance * 100) / 100,
+        equity: Math.round(initialEquity * 100) / 100,
+        yearlyMortgagePayment: 0,
+        yearlyPropertyTax: 0,
+        yearlyInsurance: 0,
+        yearlyHOA: 0,
+        yearlyMaintenance: 0,
+        totalYearlyCost: 0,
+        cumulativeCosts: 0,
+        investmentBalance: 0,
+        netWorth: Math.round(initialEquity * 100) / 100,
+      });
 
-      previousBuyMonthlyCost = buyMonthlyCost;
-      previousRentMonthlyCost = rentMonthlyCost;
+      rentBreakdown.push({
+        year: 0,
+        monthlyRent: inputs.rentInputs.monthlyRent,
+        yearlyRent: 0,
+        yearlyRentersInsurance: 0,
+        totalYearlyCost: 0,
+        cumulativeCosts: 0,
+        investmentBalance: Math.round(renterInitialInvestment * 100) / 100,
+        netWorth: Math.round(renterInitialInvestment * 100) / 100,
+      });
     } else {
-      // Subsequent years: continue investing monthly difference
-      // IMPORTANT: Compare actual monthly costs (excluding principal, which builds equity)
-      const buyMonthlyCost = buyCosts.totalCostExcludingPrincipal / 12;
+      // Years 1-20: Calculate actual costs and growth
+      // Note: year-1 because year 0 appreciation = start value, year 1 = 1 year of appreciation
+      const yearsOfAppreciation = year;
+      const currentHomeValue = inputs.buyInputs.homePrice * Math.pow(1 + inputs.buyInputs.appreciationRate / 100, yearsOfAppreciation);
+
+      // BUY SCENARIO
+      // Note: pass year-1 to calculateBuyingCosts because it expects 0 = first year
+      const buyCosts = calculateBuyingCosts(inputs.buyInputs, year - 1, currentHomeValue);
+
+      // After mortgage term, mortgage payment is 0 (house is paid off)
+      const actualMortgagePayment = year > mortgageTermYears ? 0 : buyCosts.mortgagePayment;
+      const actualTotalYearlyCost = year > mortgageTermYears
+        ? buyCosts.propertyTax + buyCosts.insurance + buyCosts.hoa + buyCosts.maintenance
+        : buyCosts.totalCost;
+
+      // Track cumulative costs for display purposes
+      // For year 1, exclude down payment and closing costs (those are in year 0)
+      if (year === 1) {
+        buyCumulativeCosts += buyCosts.totalCostExcludingPrincipal - buyCosts.downPayment - buyCosts.closingCosts;
+      } else if (year > mortgageTermYears) {
+        // After mortgage is paid off, only count ongoing costs (no mortgage)
+        buyCumulativeCosts += buyCosts.propertyTax + buyCosts.insurance + buyCosts.hoa + buyCosts.maintenance;
+      } else {
+        buyCumulativeCosts += buyCosts.totalCostExcludingPrincipal;
+      }
+
+      // Note: pass year-1 to calculateHomeEquity because it expects 0 = first year
+      const equity = calculateHomeEquity(inputs.buyInputs, year - 1, currentHomeValue);
+
+      // After mortgage is paid off, invest the mortgage payment
+      if (year > mortgageTermYears) {
+        // Mortgage is paid off - invest the monthly mortgage payment
+        const previousInvestmentBalance = buyInvestmentBalance;
+        buyInvestmentBalance = calculateInvestmentGrowth(
+          previousInvestmentBalance,
+          monthlyMortgagePayment,
+          inputs.investmentReturnRate,
+          1
+        );
+      }
+
+      // Net worth = equity + investment balance
+      const buyNetWorth = equity + buyInvestmentBalance;
+
+      buyBreakdown.push({
+        year: year,
+        homeValue: Math.round(currentHomeValue * 100) / 100,
+        mortgageBalance: Math.round((currentHomeValue - equity) * 100) / 100,
+        equity: Math.round(equity * 100) / 100,
+        yearlyMortgagePayment: Math.round(actualMortgagePayment * 100) / 100,
+        yearlyPropertyTax: buyCosts.propertyTax,
+        yearlyInsurance: buyCosts.insurance,
+        yearlyHOA: buyCosts.hoa,
+        yearlyMaintenance: buyCosts.maintenance,
+        totalYearlyCost: Math.round(actualTotalYearlyCost * 100) / 100,
+        cumulativeCosts: Math.round(buyCumulativeCosts * 100) / 100,
+        investmentBalance: Math.round(buyInvestmentBalance * 100) / 100,
+        netWorth: Math.round(buyNetWorth * 100) / 100,
+      });
+
+      // RENT SCENARIO
+      // Note: pass year-1 to calculateRentingCosts because it expects 0 = first year
+      const rentCosts = calculateRentingCosts(inputs.rentInputs, year - 1);
+      rentCumulativeCosts += rentCosts.totalCost;
+
+      // Calculate investment growth
+      // For year 1, exclude down payment and closing costs from monthly comparison
+      // (those are one-time costs paid at year 0, not ongoing monthly costs)
+      let buyYearlyCostForComparison = buyCosts.totalCostExcludingPrincipal;
+      if (year === 1) {
+        buyYearlyCostForComparison -= (buyCosts.downPayment + buyCosts.closingCosts);
+      }
+      const buyMonthlyCost = buyYearlyCostForComparison / 12;
       const rentMonthlyCost = rentCosts.totalCost / 12;
       const monthlySavings = Math.max(0, buyMonthlyCost - rentMonthlyCost);
 
-      // Get previous investment balance
-      const previousBalance = rentBreakdown[year - 1].investmentBalance;
+      let investmentBalance: number;
 
-      // Grow previous balance for one year + new monthly contributions
-      investmentBalance = calculateInvestmentGrowth(
-        previousBalance,
-        monthlySavings,
-        inputs.investmentReturnRate,
-        1
-      );
+      if (year === 1) {
+        // First year: down payment invested at start + monthly savings throughout year
+        investmentBalance = calculateInvestmentGrowth(
+          renterInitialInvestment,
+          monthlySavings,
+          inputs.investmentReturnRate,
+          1
+        );
+      } else {
+        // Subsequent years: continue investing monthly difference
+        const previousBalance = rentBreakdown[year - 1].investmentBalance;
+        investmentBalance = calculateInvestmentGrowth(
+          previousBalance,
+          monthlySavings,
+          inputs.investmentReturnRate,
+          1
+        );
+      }
+
+      const rentNetWorth = investmentBalance;
+
+      rentBreakdown.push({
+        year: year,
+        monthlyRent: rentCosts.monthlyRent,
+        yearlyRent: rentCosts.yearlyRent,
+        yearlyRentersInsurance: rentCosts.rentersInsurance,
+        totalYearlyCost: rentCosts.totalCost,
+        cumulativeCosts: Math.round(rentCumulativeCosts * 100) / 100,
+        investmentBalance: Math.round(investmentBalance * 100) / 100,
+        netWorth: Math.round(rentNetWorth * 100) / 100,
+      });
     }
-
-    // Net Worth = Assets - Liabilities
-    // For renter: Assets = Investment Balance, Liabilities = 0
-    const rentNetWorth = investmentBalance;
-
-    rentBreakdown.push({
-      year: year + 1,
-      monthlyRent: rentCosts.monthlyRent,
-      yearlyRent: rentCosts.yearlyRent,
-      yearlyRentersInsurance: rentCosts.rentersInsurance,
-      totalYearlyCost: rentCosts.totalCost,
-      cumulativeCosts: Math.round(rentCumulativeCosts * 100) / 100,
-      investmentBalance: Math.round(investmentBalance * 100) / 100,
-      netWorth: Math.round(rentNetWorth * 100) / 100,
-    });
   }
 
   // Find break-even year (when net worths cross over)
@@ -546,7 +607,7 @@ export function compareBuyVsRent(inputs: BuyVsRentInputs): BuyVsRentResults {
     // Check if lines crossed
     if ((prevBuyNW <= prevRentNW && currBuyNW >= currRentNW) ||
         (prevBuyNW >= prevRentNW && currBuyNW <= currRentNW)) {
-      breakEvenYear = i + 1;
+      breakEvenYear = buyBreakdown[i].year;
       break;
     }
   }

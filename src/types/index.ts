@@ -79,7 +79,8 @@ export interface BuyYearlyBreakdown {
   yearlyMaintenance: number;        // Maintenance costs for the year
   totalYearlyCost: number;          // Sum of all costs for the year
   cumulativeCosts: number;          // Total costs paid from year 0 to this year
-  netWorth: number;                 // Equity - cumulative costs (includes selling costs if final year)
+  investmentBalance: number;        // Investment balance (grows after mortgage is paid off)
+  netWorth: number;                 // Equity + investment balance
 }
 
 export interface RentYearlyBreakdown {

@@ -347,21 +347,37 @@ export const BuyVsRentForm: React.FC<BuyVsRentFormProps> = ({
               step={0.1}
             />
 
-            <FormInput
-              label="Time Horizon (Years)"
-              name="timeHorizonYears"
-              value={timeHorizonYears}
-              onChange={(_, value) => {
-                setTimeHorizonYears(value);
-                if (hasValidated) validateForm();
-              }}
-              type="number"
-              placeholder="30"
-              tooltip="How many years to compare (how long do you plan to stay?)"
-              error={getError('timeHorizonYears')}
-              min={1}
-              max={50}
-            />
+            {/* Time Horizon Selector */}
+            <div className="space-y-2">
+              <label className="label">
+                Time Horizon
+                <span className="text-text-tertiary text-xs ml-2">
+                  (How many years to compare)
+                </span>
+              </label>
+              <div className="grid grid-cols-4 md:grid-cols-7 gap-2">
+                {[10, 15, 20, 25, 30, 35, 40].map((years) => (
+                  <button
+                    key={years}
+                    type="button"
+                    onClick={() => {
+                      setTimeHorizonYears(years);
+                      if (hasValidated) validateForm();
+                    }}
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                      timeHorizonYears === years
+                        ? 'bg-accent-primary text-bg-primary shadow-glow-blue'
+                        : 'bg-bg-elevated text-text-secondary hover:bg-bg-tertiary hover:text-text-primary'
+                    }`}
+                  >
+                    {years}y
+                  </button>
+                ))}
+              </div>
+              {getError('timeHorizonYears') && (
+                <p className="text-error text-sm mt-1">{getError('timeHorizonYears')}</p>
+              )}
+            </div>
           </div>
         </div>
       </CollapsibleSection>
