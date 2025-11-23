@@ -31,10 +31,12 @@ const Home: React.FC = () => {
         <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
           {/* Buy vs Rent */}
           <div className="card card-sweep opacity-0 animate-fade-in-up stagger-1">
-            <div className="w-12 h-12 bg-accent-primary rounded-lg flex items-center justify-center mb-4 transition-all hover:shadow-glow-blue">
-              <HomeIcon className="w-6 h-6 text-bg-primary" />
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-accent-primary rounded-lg flex items-center justify-center transition-all hover:shadow-glow-blue flex-shrink-0">
+                <HomeIcon className="w-6 h-6 text-bg-primary" />
+              </div>
+              <h3 className="text-lg font-semibold text-text-primary">Buy vs Rent</h3>
             </div>
-            <h3 className="text-lg font-semibold text-text-primary mb-2">Buy vs Rent</h3>
             <p className="text-text-secondary mb-4">
               Should you buy a home or rent and invest the difference?
             </p>
@@ -48,10 +50,12 @@ const Home: React.FC = () => {
 
           {/* Car vs Invest */}
           <div className="card card-sweep opacity-0 animate-fade-in-up stagger-2">
-            <div className="w-12 h-12 bg-accent-primary rounded-lg flex items-center justify-center mb-4 transition-all hover:shadow-glow-blue">
-              <Car className="w-6 h-6 text-bg-primary" />
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-accent-primary rounded-lg flex items-center justify-center transition-all hover:shadow-glow-blue flex-shrink-0">
+                <Car className="w-6 h-6 text-bg-primary" />
+              </div>
+              <h3 className="text-lg font-semibold text-text-primary">Car vs Invest</h3>
             </div>
-            <h3 className="text-lg font-semibold text-text-primary mb-2">Car vs Invest</h3>
             <p className="text-text-secondary mb-4">
               What's the impact of buying a car now vs investing that money?
             </p>
@@ -65,10 +69,12 @@ const Home: React.FC = () => {
 
           {/* Contribution Impact */}
           <div className="card card-sweep opacity-0 animate-fade-in-up stagger-3">
-            <div className="w-12 h-12 bg-accent-primary rounded-lg flex items-center justify-center mb-4 transition-all hover:shadow-glow-blue">
-              <PiggyBank className="w-6 h-6 text-bg-primary" />
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-accent-primary rounded-lg flex items-center justify-center transition-all hover:shadow-glow-blue flex-shrink-0">
+                <PiggyBank className="w-6 h-6 text-bg-primary" />
+              </div>
+              <h3 className="text-lg font-semibold text-text-primary">Contribution Impact</h3>
             </div>
-            <h3 className="text-lg font-semibold text-text-primary mb-2">Contribution Impact</h3>
             <p className="text-text-secondary mb-4">
               How much do your monthly contributions affect your net worth?
             </p>
