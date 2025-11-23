@@ -482,12 +482,12 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
       </div>
 
       {/* Year-by-Year Breakdown Table */}
-      <div className="card">
-        <div className="space-y-4 sm:space-y-6">
+      <div className="card overflow-hidden">
+        <div className="space-y-0">
           {/* Header with toggle */}
           <button
             onClick={() => setShowBreakdown(!showBreakdown)}
-            className="w-full flex items-center justify-between group px-4"
+            className="w-full flex items-center justify-between group px-4 py-4 sm:py-6"
           >
             <h3 className="font-display text-base sm:text-lg md:text-xl font-semibold text-text-primary uppercase tracking-wider">
               Year-by-Year Breakdown
@@ -515,9 +515,8 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
 
           {/* Table */}
           {showBreakdown && (
-            <div className="w-full overflow-x-auto animate-fade-in-up">
-              <div className="px-4">
-                <table className="w-full text-xs sm:text-sm min-w-[500px]">
+            <div className="w-full overflow-x-auto animate-fade-in-up border-t border-border-subtle">
+              <table className="w-full text-xs sm:text-sm" style={{ minWidth: '500px' }}>
                 <thead>
                   <tr className="border-b border-border-default">
                     <th className="label text-left py-2 sm:py-3 px-2 sm:px-4">Year</th>
@@ -564,7 +563,6 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
                   })}
                 </tbody>
               </table>
-              </div>
             </div>
           )}
         </div>
