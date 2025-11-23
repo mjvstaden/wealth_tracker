@@ -122,7 +122,7 @@ export const BuyVsRentForm: React.FC<BuyVsRentFormProps> = ({
   const monthlyMortgage = calculateMonthlyMortgage();
 
   return (
-    <form onSubmit={handleSubmit} className={`space-y-6 ${className}`}>
+    <form onSubmit={handleSubmit} className={`space-y-6 overflow-x-hidden ${className}`}>
       {/* Buy Scenario Section */}
       <CollapsibleSection title="Buy Scenario" badge="Home Purchase" defaultOpen={true}>
         <div className="space-y-6">

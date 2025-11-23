@@ -22,7 +22,7 @@ export const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className={`border border-border-default rounded-md overflow-hidden transition-all duration-300 ${className}`}>
+    <div className={`border border-border-default rounded-md overflow-x-hidden transition-all duration-300 ${className}`}>
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
