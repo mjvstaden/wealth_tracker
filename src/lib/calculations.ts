@@ -597,6 +597,7 @@ export function compareBuyVsRent(inputs: BuyVsRentInputs): BuyVsRentResults {
   }
 
   // Find break-even year (when net worths cross over)
+  // Find the LAST time they cross, not the first
   let breakEvenYear: number | null = null;
   for (let i = 1; i < buyBreakdown.length; i++) {
     const prevBuyNW = buyBreakdown[i - 1].netWorth;
@@ -608,7 +609,7 @@ export function compareBuyVsRent(inputs: BuyVsRentInputs): BuyVsRentResults {
     if ((prevBuyNW <= prevRentNW && currBuyNW >= currRentNW) ||
         (prevBuyNW >= prevRentNW && currBuyNW <= currRentNW)) {
       breakEvenYear = buyBreakdown[i].year;
-      break;
+      // Don't break - keep checking to find the LAST crossover
     }
   }
 

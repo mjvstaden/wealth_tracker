@@ -135,12 +135,12 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
       </div>
 
       {/* Key Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
         {/* Stat 1: Final Buy Net Worth */}
         <div className="card card-sweep opacity-0 animate-fade-in-up stagger-1">
-          <div className="space-y-2">
-            <div className="label text-xs sm:text-sm">Buy Net Worth</div>
-            <div className={`font-mono text-xl sm:text-2xl font-bold ${
+          <div className="space-y-1 sm:space-y-2">
+            <div className="label text-xs">Buy Net Worth</div>
+            <div className={`font-mono text-lg sm:text-xl lg:text-2xl font-bold ${
               isBuyBetter ? 'text-accent-primary' : 'text-text-primary'
             }`}>
               {currency.format(results.finalBuyNetWorth, true)}
@@ -153,9 +153,9 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
 
         {/* Stat 2: Final Rent Net Worth */}
         <div className="card card-sweep opacity-0 animate-fade-in-up stagger-2">
-          <div className="space-y-2">
-            <div className="label text-xs sm:text-sm">Rent Net Worth</div>
-            <div className={`font-mono text-xl sm:text-2xl font-bold ${
+          <div className="space-y-1 sm:space-y-2">
+            <div className="label text-xs">Rent Net Worth</div>
+            <div className={`font-mono text-lg sm:text-xl lg:text-2xl font-bold ${
               !isBuyBetter ? 'text-accent-light' : 'text-text-primary'
             }`}>
               {currency.format(results.finalRentNetWorth, true)}
@@ -168,9 +168,9 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
 
         {/* Stat 3: Difference */}
         <div className="card card-sweep opacity-0 animate-fade-in-up stagger-3">
-          <div className="space-y-2">
-            <div className="label text-xs sm:text-sm">Difference</div>
-            <div className="font-mono text-xl sm:text-2xl font-bold text-success">
+          <div className="space-y-1 sm:space-y-2">
+            <div className="label text-xs">Difference</div>
+            <div className="font-mono text-lg sm:text-xl lg:text-2xl font-bold text-success">
               {currency.format(totalDifference, true)}
             </div>
             <div className="text-xs text-text-tertiary">
@@ -181,9 +181,9 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
 
         {/* Stat 4: Break Even Year */}
         <div className="card card-sweep opacity-0 animate-fade-in-up stagger-4">
-          <div className="space-y-2">
-            <div className="label text-xs sm:text-sm">Break Even</div>
-            <div className="font-mono text-xl sm:text-2xl font-bold text-text-primary">
+          <div className="space-y-1 sm:space-y-2">
+            <div className="label text-xs">Break Even</div>
+            <div className="font-mono text-lg sm:text-xl lg:text-2xl font-bold text-text-primary">
               {results.breakEvenYear !== null ? `Year ${results.breakEvenYear}` : 'Never'}
             </div>
             <div className="text-xs text-text-tertiary">
