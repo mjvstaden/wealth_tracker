@@ -5,9 +5,7 @@ import {
   TrendingUp,
   Bookmark,
   Info,
-  ChevronLeft,
-  BarChart3,
-  Calculator
+  ChevronLeft
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -78,27 +76,6 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
         })}
       </nav>
 
-      {/* Quick Stats (visible when sidebar is open) */}
-      {isOpen && (
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border-default bg-bg-secondary animate-fade-in">
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <BarChart3 className="w-4 h-4 text-accent-primary" />
-                <span className="text-sm text-text-secondary">Portfolio Value</span>
-              </div>
-              <span className="text-sm font-semibold font-mono text-text-primary">$125,430</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Calculator className="w-4 h-4 text-accent-primary" />
-                <span className="text-sm text-text-secondary">Active Scenarios</span>
-              </div>
-              <span className="text-sm font-semibold font-mono text-text-primary">3</span>
-            </div>
-          </div>
-        </div>
-      )}
     </aside>
   );
 };
