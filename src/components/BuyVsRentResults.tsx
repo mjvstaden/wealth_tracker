@@ -107,7 +107,7 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
   const nextYearMonthlyRent = finalMonthlyRent * (1 + inputs.rentInputs.rentIncreaseRate / 100);
 
   return (
-    <div className={`space-y-8 sm:space-y-12 ${className}`}>
+    <div className={`space-y-8 sm:space-y-12 overflow-x-hidden ${className}`}>
       {/* Hero Summary */}
       <div className="text-center space-y-4 sm:space-y-6 animate-fade-in-up">
         <div className="inline-block">
@@ -196,7 +196,7 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
       </div>
 
       {/* Side-by-Side Comparison - Single Card */}
-      <div className="card opacity-0 animate-fade-in-up stagger-2">
+      <div className="card opacity-0 animate-fade-in-up stagger-2 overflow-hidden">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 divide-y lg:divide-y-0 lg:divide-x divide-border-default">
 
           {/* BUY SCENARIO */}
@@ -464,33 +464,35 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
       </div>
 
       {/* Net Worth Chart */}
-      <div className="card">
-        <div className="space-y-6">
-          <h3 className="font-display text-xl font-semibold text-text-primary uppercase tracking-wider text-center">
+      <div className="card overflow-hidden">
+        <div className="space-y-4 sm:space-y-6">
+          <h3 className="font-display text-base sm:text-lg md:text-xl font-semibold text-text-primary uppercase tracking-wider text-center">
             Net Worth Over Time
           </h3>
 
-          <NetWorthChart
-            buyBreakdown={results.buyBreakdown}
-            rentBreakdown={results.rentBreakdown}
-          />
+          <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+            <NetWorthChart
+              buyBreakdown={results.buyBreakdown}
+              rentBreakdown={results.rentBreakdown}
+            />
+          </div>
         </div>
       </div>
 
       {/* Year-by-Year Breakdown Table */}
-      <div className="card">
-        <div className="space-y-6">
+      <div className="card overflow-hidden">
+        <div className="space-y-4 sm:space-y-6">
           {/* Header with toggle */}
           <button
             onClick={() => setShowBreakdown(!showBreakdown)}
             className="w-full flex items-center justify-between group"
           >
-            <h3 className="font-display text-xl font-semibold text-text-primary uppercase tracking-wider">
+            <h3 className="font-display text-base sm:text-lg md:text-xl font-semibold text-text-primary uppercase tracking-wider">
               Year-by-Year Breakdown
             </h3>
 
-            <div className="flex items-center gap-3">
-              <span className="text-sm text-text-secondary group-hover:text-accent-primary transition-colors">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <span className="text-xs sm:text-sm text-text-secondary group-hover:text-accent-primary transition-colors">
                 {showBreakdown ? 'Hide Details' : 'Show Details'}
               </span>
               <svg
@@ -511,8 +513,8 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
 
           {/* Table */}
           {showBreakdown && (
-            <div className="overflow-x-auto animate-fade-in-up">
-              <table className="w-full text-xs sm:text-sm">
+            <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0 animate-fade-in-up">
+              <table className="w-full text-xs sm:text-sm min-w-[600px]">
                 <thead>
                   <tr className="border-b border-border-default">
                     <th className="label text-left py-2 sm:py-3 px-2 sm:px-4">Year</th>

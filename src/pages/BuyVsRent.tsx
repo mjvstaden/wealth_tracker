@@ -42,7 +42,7 @@ const BuyVsRent: React.FC = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="max-w-6xl mx-auto px-4 py-8 overflow-x-hidden">
       {/* Header */}
       <div className="mb-6 sm:mb-8 opacity-0 animate-fade-in-up">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-4">
