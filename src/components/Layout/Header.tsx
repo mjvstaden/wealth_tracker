@@ -37,12 +37,6 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
             Home
           </Link>
           <Link
-            to="/scenarios"
-            className="nav-link"
-          >
-            Scenarios
-          </Link>
-          <Link
             to="/saved"
             className="nav-link"
           >

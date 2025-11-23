@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/layout/Layout';
 import Home from './pages/Home';
-import Scenarios from './pages/Scenarios';
 import BuyVsRent from './pages/BuyVsRent';
 import './styles/globals.css';
 
@@ -13,7 +12,6 @@ function App() {
         {/* Public Routes - No authentication required for MVP */}
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path="scenarios" element={<Scenarios />} />
           <Route path="buy-vs-rent" element={<BuyVsRent />} />
 
           {/* Placeholder routes for future MVP pages */}

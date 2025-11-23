@@ -18,7 +18,6 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ isOpen, onToggle }) => {
   const navItems = [
     { path: '/', name: 'Home', icon: Home },
-    { path: '/scenarios', name: 'Scenarios', icon: TrendingUp },
     { path: '/saved', name: 'Saved', icon: Bookmark },
     { path: '/about', name: 'About', icon: Info },
   ];
