@@ -119,17 +119,17 @@ export function validateBuyInputs(inputs: BuyScenarioInputs): ValidationError[] 
   const errors: ValidationError[] = [];
 
   // Home price validation
-  if (inputs.homePrice < 10000) {
+  if (inputs.homePrice < 100000) {
     errors.push({
       field: 'homePrice',
-      message: 'Home price must be at least $10,000',
+      message: 'Home price must be at least R100,000',
     });
   }
 
-  if (inputs.homePrice > 50000000) {
+  if (inputs.homePrice > 100000000) {
     errors.push({
       field: 'homePrice',
-      message: 'Home price cannot exceed $50,000,000',
+      message: 'Home price cannot exceed R100,000,000',
     });
   }
 
@@ -193,33 +193,33 @@ export function validateBuyInputs(inputs: BuyScenarioInputs): ValidationError[] 
     });
   }
 
-  // Home insurance validation
-  if (inputs.homeInsurance < 0) {
+  // Home insurance rate validation
+  if (inputs.homeInsuranceRate < 0) {
     errors.push({
-      field: 'homeInsurance',
-      message: 'Home insurance cannot be negative',
+      field: 'homeInsuranceRate',
+      message: 'Home insurance rate cannot be negative',
     });
   }
 
-  if (inputs.homeInsurance > 50000) {
+  if (inputs.homeInsuranceRate > 5) {
     errors.push({
-      field: 'homeInsurance',
-      message: 'Home insurance seems unrealistic (>$50,000/year)',
+      field: 'homeInsuranceRate',
+      message: 'Home insurance rate seems unrealistic (>5%)',
     });
   }
 
-  // HOA fees validation
+  // Levies validation (annual)
   if (inputs.hoaFees < 0) {
     errors.push({
       field: 'hoaFees',
-      message: 'HOA fees cannot be negative',
+      message: 'Levies cannot be negative',
     });
   }
 
-  if (inputs.hoaFees > 5000) {
+  if (inputs.hoaFees > 120000) {
     errors.push({
       field: 'hoaFees',
-      message: 'HOA fees seem unrealistic (>$5,000/month)',
+      message: 'Levies seem unrealistic (>R120,000/year)',
     });
   }
 
@@ -258,18 +258,18 @@ export function validateBuyInputs(inputs: BuyScenarioInputs): ValidationError[] 
     });
   }
 
-  // Closing costs percentage validation
-  if (inputs.closingCostsPercent < 0) {
+  // Transfer & bond fees validation
+  if (inputs.closingCosts < 0) {
     errors.push({
-      field: 'closingCostsPercent',
-      message: 'Closing costs percentage cannot be negative',
+      field: 'closingCosts',
+      message: 'Transfer fees cannot be negative',
     });
   }
 
-  if (inputs.closingCostsPercent > 10) {
+  if (inputs.closingCosts > inputs.homePrice * 0.15) {
     errors.push({
-      field: 'closingCostsPercent',
-      message: 'Closing costs percentage seems unrealistic (>10%)',
+      field: 'closingCosts',
+      message: 'Transfer fees seem unrealistic (>15% of home price)',
     });
   }
 
@@ -295,9 +295,9 @@ export function validateBuyInputs(inputs: BuyScenarioInputs): ValidationError[] 
  * Validate rent scenario inputs
  *
  * Validation rules:
- * - Monthly rent: $100 - $50,000
+ * - Monthly rent: R100 - R100,000
  * - Rent increase rate: 0% - 20% (warn if > 10%)
- * - Renters insurance: $0 - $10,000/year
+ * - Renters insurance: R0 - R50,000/year
  */
 export function validateRentInputs(inputs: RentScenarioInputs): ValidationError[] {
   const errors: ValidationError[] = [];
@@ -306,14 +306,14 @@ export function validateRentInputs(inputs: RentScenarioInputs): ValidationError[
   if (inputs.monthlyRent < 100) {
     errors.push({
       field: 'monthlyRent',
-      message: 'Monthly rent must be at least $100',
+      message: 'Monthly rent must be at least R100',
     });
   }
 
-  if (inputs.monthlyRent > 50000) {
+  if (inputs.monthlyRent > 100000) {
     errors.push({
       field: 'monthlyRent',
-      message: 'Monthly rent cannot exceed $50,000',
+      message: 'Monthly rent cannot exceed R100,000',
     });
   }
 
@@ -345,10 +345,10 @@ export function validateRentInputs(inputs: RentScenarioInputs): ValidationError[
     });
   }
 
-  if (inputs.rentersInsurance > 10000) {
+  if (inputs.rentersInsurance > 50000) {
     errors.push({
       field: 'rentersInsurance',
-      message: 'Renters insurance seems unrealistic (>$10,000/year)',
+      message: 'Renters insurance seems unrealistic (>R50,000/year)',
     });
   }
 
