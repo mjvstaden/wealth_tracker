@@ -49,20 +49,50 @@ export const FormInput: React.FC<FormInputProps> = ({
     }
   }, [value, isFocused]);
 
+  const formatWithSeparators = (numValue: number): string => {
+    if (numValue === 0) return '';
+
+    if (type === 'currency' || (type === 'number' && numValue >= 1000)) {
+      return numValue.toLocaleString('en-ZA', {
+        maximumFractionDigits: 0,
+        useGrouping: true,
+      });
+    }
+
+    if (type === 'percentage') {
+      return numValue.toLocaleString('en-ZA', {
+        maximumFractionDigits: 2,
+        useGrouping: false,
+      });
+    }
+
+    return numValue.toString();
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Remove all non-numeric characters except decimal point and minus
     const rawValue = e.target.value.replace(/[^0-9.-]/g, '');
-    setInputValue(rawValue);
 
     const numValue = rawValue === '' ? 0 : parseFloat(rawValue);
     if (!isNaN(numValue)) {
+      // Format with thousand separators for display
+      if (type === 'currency' && numValue > 0) {
+        setInputValue(formatWithSeparators(numValue));
+      } else {
+        setInputValue(rawValue);
+      }
       onChange(name, numValue);
     }
   };
 
   const handleFocus = () => {
     setIsFocused(true);
-    // When focused, show the raw numeric value without formatting
-    setInputValue(value === 0 ? '' : value.toString());
+    // Keep the formatted value when focused for currency
+    if (type === 'currency' && value > 0) {
+      setInputValue(formatWithSeparators(value));
+    } else {
+      setInputValue(value === 0 ? '' : value.toString());
+    }
   };
 
   const handleBlur = () => {

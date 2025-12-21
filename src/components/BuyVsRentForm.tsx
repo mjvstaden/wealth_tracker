@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BuyVsRentInputs, BuyScenarioInputs, RentScenarioInputs } from '../types';
 import { validateBuyVsRent, ValidationError } from '../lib/validators';
+import { calculateTransferDuty, calculateBondRegistrationFees } from '../lib/calculations';
 import { CollapsibleSection } from './shared/CollapsibleSection';
 import { FormInput } from './shared/FormInput';
 import { FormSelect } from './shared/FormSelect';
@@ -43,6 +44,10 @@ export const BuyVsRentForm: React.FC<BuyVsRentFormProps> = ({
     initialValues?.timeHorizonYears || defaults.timeHorizonYears
   );
 
+  // Track if this is the first render to avoid updating on initial load
+  const isFirstRender = useRef(true);
+  const previousHomePrice = useRef(buyInputs.homePrice);
+
   // Reset form when region changes (unless there are initial values)
   useEffect(() => {
     if (!initialValues) {
@@ -52,8 +57,47 @@ export const BuyVsRentForm: React.FC<BuyVsRentFormProps> = ({
       setTimeHorizonYears(defaults.timeHorizonYears);
       setErrors([]);
       setHasValidated(false);
+      previousHomePrice.current = defaults.buyInputs.homePrice;
     }
   }, [config.region, defaults, initialValues]);
+
+  // Update derived values when home price changes
+  useEffect(() => {
+    // Skip first render
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    // Only update if home price actually changed
+    if (buyInputs.homePrice === previousHomePrice.current) {
+      return;
+    }
+
+    previousHomePrice.current = buyInputs.homePrice;
+    const homePrice = buyInputs.homePrice;
+
+    if (homePrice > 0) {
+      // Calculate derived values based on home price
+      const bondAmount = homePrice * (1 - buyInputs.downPaymentPercent / 100);
+      const transferDuty = calculateTransferDuty(homePrice);
+      const bondFees = calculateBondRegistrationFees(bondAmount);
+      const legalFees = 20000; // Approximate legal fees
+      const closingCosts = transferDuty + bondFees + legalFees;
+
+      const monthlyRent = Math.round(homePrice * 0.005); // ~0.5% monthly (~6% annual yield)
+
+      setBuyInputs(prev => ({
+        ...prev,
+        closingCosts,
+      }));
+
+      setRentInputs(prev => ({
+        ...prev,
+        monthlyRent,
+      }));
+    }
+  }, [buyInputs.homePrice, buyInputs.downPaymentPercent]);
 
   const [errors, setErrors] = useState<ValidationError[]>([]);
   const [hasValidated, setHasValidated] = useState(false);
@@ -139,16 +183,25 @@ export const BuyVsRentForm: React.FC<BuyVsRentFormProps> = ({
               error={getError('homePrice')}
             />
 
-            <FormInput
-              label={`${terminology.downPayment} %`}
-              name="downPaymentPercent"
-              value={buyInputs.downPaymentPercent}
-              onChange={updateBuyInput}
-              type="percentage"
-              placeholder="20"
-              tooltip="Percentage of home price paid upfront (typically 20% avoids PMI)"
-              error={getError('downPaymentPercent')}
-            />
+            <div className="space-y-2">
+              <FormInput
+                label={`${terminology.downPayment} %`}
+                name="downPaymentPercent"
+                value={buyInputs.downPaymentPercent}
+                onChange={updateBuyInput}
+                type="percentage"
+                placeholder="20"
+                tooltip="Percentage of home price paid upfront (typically 10-20% is common)"
+                error={getError('downPaymentPercent')}
+              />
+              {/* Deposit amount display */}
+              <div className="text-xs text-text-tertiary">
+                {terminology.downPayment} amount:{' '}
+                <span className="font-mono text-accent-primary">
+                  {currency.format(buyInputs.homePrice * buyInputs.downPaymentPercent / 100, false)}
+                </span>
+              </div>
+            </div>
           </div>
 
           {/* Row 2: Interest Rate and Loan Term */}
@@ -191,95 +244,112 @@ export const BuyVsRentForm: React.FC<BuyVsRentFormProps> = ({
 
           {/* Row 3: Property Tax and Insurance */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormInput
-              label={terminology.propertyTaxRate}
-              name="propertyTaxRate"
-              value={buyInputs.propertyTaxRate}
-              onChange={updateBuyInput}
-              type="percentage"
-              placeholder="1.2"
-              tooltip={config.helpText.propertyTaxRate}
-              error={getError('propertyTaxRate')}
-              step={0.1}
-            />
+            <div className="space-y-2">
+              <FormInput
+                label={terminology.propertyTaxRate}
+                name="propertyTaxRate"
+                value={buyInputs.propertyTaxRate}
+                onChange={updateBuyInput}
+                type="percentage"
+                placeholder="1.2"
+                tooltip={config.helpText.propertyTaxRate}
+                error={getError('propertyTaxRate')}
+                step={0.1}
+              />
+              <div className="text-xs text-text-tertiary">
+                Annual amount:{' '}
+                <span className="font-mono text-accent-primary">
+                  {currency.format(buyInputs.homePrice * buyInputs.propertyTaxRate / 100, false)}
+                </span>
+              </div>
+            </div>
 
-            <FormInput
-              label={terminology.homeInsurance}
-              name="homeInsurance"
-              value={buyInputs.homeInsurance}
-              onChange={updateBuyInput}
-              type="currency"
-              placeholder="1,200"
-              tooltip="Yearly cost of homeowners insurance"
-              error={getError('homeInsurance')}
-            />
+            <div className="space-y-2">
+              <FormInput
+                label={`${terminology.homeInsurance} Rate %`}
+                name="homeInsuranceRate"
+                value={buyInputs.homeInsuranceRate}
+                onChange={updateBuyInput}
+                type="percentage"
+                placeholder="0.5"
+                tooltip="Annual homeowners insurance as % of property value"
+                error={getError('homeInsuranceRate')}
+                step={0.1}
+              />
+              <div className="text-xs text-text-tertiary">
+                Annual amount:{' '}
+                <span className="font-mono text-accent-primary">
+                  {currency.format(buyInputs.homePrice * buyInputs.homeInsuranceRate / 100, false)}
+                </span>
+              </div>
+            </div>
           </div>
 
           {/* Row 4: HOA and Maintenance */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FormInput
-              label={terminology.hoaFees}
+              label={`${terminology.hoaFees} (Annual)`}
               name="hoaFees"
               value={buyInputs.hoaFees}
               onChange={updateBuyInput}
               type="currency"
               placeholder="0"
-              tooltip="Monthly homeowners association fees (enter 0 if none)"
+              tooltip="Annual levies/body corporate fees (enter 0 if not in a complex)"
               error={getError('hoaFees')}
             />
 
-            <FormInput
-              label="Maintenance Rate %"
-              name="maintenanceRate"
-              value={buyInputs.maintenanceRate}
-              onChange={updateBuyInput}
-              type="percentage"
-              placeholder="1"
-              tooltip={config.helpText.maintenanceRate}
-              error={getError('maintenanceRate')}
-              step={0.1}
-            />
+            <div className="space-y-2">
+              <FormInput
+                label="Maintenance Rate %"
+                name="maintenanceRate"
+                value={buyInputs.maintenanceRate}
+                onChange={updateBuyInput}
+                type="percentage"
+                placeholder="1"
+                tooltip={config.helpText.maintenanceRate}
+                error={getError('maintenanceRate')}
+                step={0.1}
+              />
+              <div className="text-xs text-text-tertiary">
+                Annual amount:{' '}
+                <span className="font-mono text-accent-primary">
+                  {currency.format(buyInputs.homePrice * buyInputs.maintenanceRate / 100, false)}
+                </span>
+              </div>
+            </div>
           </div>
 
           {/* Row 5: Appreciation Rate */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormInput
-              label="Home Appreciation Rate %"
-              name="appreciationRate"
-              value={buyInputs.appreciationRate}
-              onChange={updateBuyInput}
-              type="percentage"
-              placeholder="3"
-              tooltip={config.helpText.appreciationRate}
-              error={getError('appreciationRate')}
-              step={0.1}
-            />
+            <div className="space-y-2">
+              <FormInput
+                label="Home Appreciation Rate %"
+                name="appreciationRate"
+                value={buyInputs.appreciationRate}
+                onChange={updateBuyInput}
+                type="percentage"
+                placeholder="3"
+                tooltip={config.helpText.appreciationRate}
+                error={getError('appreciationRate')}
+                step={0.1}
+              />
+              <div className="text-xs text-text-tertiary">
+                Year 1 gain:{' '}
+                <span className="font-mono text-accent-primary">
+                  {currency.format(buyInputs.homePrice * buyInputs.appreciationRate / 100, false)}
+                </span>
+              </div>
+            </div>
 
             <FormInput
-              label={terminology.closingCostsPercent}
-              name="closingCostsPercent"
-              value={buyInputs.closingCostsPercent}
+              label={terminology.closingCosts}
+              name="closingCosts"
+              value={buyInputs.closingCosts}
               onChange={updateBuyInput}
-              type="percentage"
-              placeholder="3"
+              type="currency"
+              placeholder="137,500"
               tooltip={config.helpText.closingCosts}
-              error={getError('closingCostsPercent')}
-              step={0.1}
-            />
-          </div>
-
-          {/* Row 6: Selling Costs */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormInput
-              label={terminology.sellingCostsPercent}
-              name="sellingCostsPercent"
-              value={buyInputs.sellingCostsPercent}
-              onChange={updateBuyInput}
-              type="percentage"
-              placeholder="6"
-              tooltip={config.helpText.sellingCosts}
-              error={getError('sellingCostsPercent')}
-              step={0.1}
+              error={getError('closingCosts')}
             />
           </div>
         </div>
@@ -295,36 +365,32 @@ export const BuyVsRentForm: React.FC<BuyVsRentFormProps> = ({
               value={rentInputs.monthlyRent}
               onChange={updateRentInput}
               type="currency"
-              placeholder="2,000"
-              tooltip="Current monthly rent payment"
+              placeholder="12,000"
+              tooltip="Monthly rent payment"
               error={getError('monthlyRent')}
             />
 
-            <FormInput
-              label="Annual Rent Increase %"
-              name="rentIncreaseRate"
-              value={rentInputs.rentIncreaseRate}
-              onChange={updateRentInput}
-              type="percentage"
-              placeholder="3"
-              tooltip="Expected annual rent increase (historical average is ~3%)"
-              error={getError('rentIncreaseRate')}
-              step={0.1}
-            />
+            <div className="space-y-2">
+              <FormInput
+                label="Annual Rent Increase %"
+                name="rentIncreaseRate"
+                value={rentInputs.rentIncreaseRate}
+                onChange={updateRentInput}
+                type="percentage"
+                placeholder="6"
+                tooltip="Expected annual rent increase (typically CPI + 1-2%)"
+                error={getError('rentIncreaseRate')}
+                step={0.1}
+              />
+              <div className="text-xs text-text-tertiary">
+                Next year's rent:{' '}
+                <span className="font-mono text-accent-primary">
+                  {currency.format(rentInputs.monthlyRent * (1 + rentInputs.rentIncreaseRate / 100), false)}/month
+                </span>
+              </div>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormInput
-              label={terminology.rentersInsurance}
-              name="rentersInsurance"
-              value={rentInputs.rentersInsurance}
-              onChange={updateRentInput}
-              type="currency"
-              placeholder="200"
-              tooltip="Yearly cost of renters insurance"
-              error={getError('rentersInsurance')}
-            />
-          </div>
         </div>
       </CollapsibleSection>
 
@@ -332,20 +398,28 @@ export const BuyVsRentForm: React.FC<BuyVsRentFormProps> = ({
       <CollapsibleSection title="Settings" badge="Analysis Parameters" defaultOpen={true}>
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <FormInput
-              label="Investment Return Rate %"
-              name="investmentReturnRate"
-              value={investmentReturnRate}
-              onChange={(_, value) => {
-                setInvestmentReturnRate(value);
-                if (hasValidated) validateForm();
-              }}
-              type="percentage"
-              placeholder="7"
-              tooltip={config.helpText.investmentReturnRate}
-              error={getError('investmentReturnRate')}
-              step={0.1}
-            />
+            <div className="space-y-2">
+              <FormInput
+                label="Investment Return Rate %"
+                name="investmentReturnRate"
+                value={investmentReturnRate}
+                onChange={(_, value) => {
+                  setInvestmentReturnRate(value);
+                  if (hasValidated) validateForm();
+                }}
+                type="percentage"
+                placeholder="7"
+                tooltip={config.helpText.investmentReturnRate}
+                error={getError('investmentReturnRate')}
+                step={0.1}
+              />
+              <div className="text-xs text-text-tertiary">
+                Year 1 return on deposit + closing costs:{' '}
+                <span className="font-mono text-accent-primary">
+                  {currency.format(((buyInputs.homePrice * buyInputs.downPaymentPercent / 100) + buyInputs.closingCosts) * investmentReturnRate / 100, false)}
+                </span>
+              </div>
+            </div>
 
             {/* Time Horizon Selector */}
             <div className="space-y-2">
