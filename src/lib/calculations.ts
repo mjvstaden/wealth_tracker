@@ -273,7 +273,7 @@ export function calculateBuyingCosts(
   totalCostExcludingPrincipal: number;
 } {
   const downPayment = year === 0 ? (inputs.homePrice * inputs.downPaymentPercent / 100) : 0;
-  const closingCosts = year === 0 ? (inputs.homePrice * inputs.closingCostsPercent / 100) : 0;
+  const closingCosts = year === 0 ? inputs.closingCosts : 0;
 
   const loanAmount = inputs.homePrice - (inputs.homePrice * inputs.downPaymentPercent / 100);
   const monthlyMortgage = calculateMonthlyMortgage(loanAmount, inputs.interestRate, inputs.loanTermYears);
@@ -295,8 +295,8 @@ export function calculateBuyingCosts(
   }
 
   const propertyTax = currentHomeValue * inputs.propertyTaxRate / 100;
-  const insurance = inputs.homeInsurance;
-  const hoa = inputs.hoaFees * 12;
+  const insurance = currentHomeValue * inputs.homeInsuranceRate / 100;
+  const hoa = inputs.hoaFees; // Already annual
   const maintenance = currentHomeValue * inputs.maintenanceRate / 100;
 
   const totalCost = downPayment + closingCosts + yearlyMortgage + propertyTax + insurance + hoa + maintenance;
@@ -366,19 +366,19 @@ export function calculateRentingCosts(
   year: number
 ): {
   monthlyRent: number;
-  yearlyRent: number;
+  annualRent: number;
   rentersInsurance: number;
   totalCost: number;
 } {
   // Calculate rent for this year (increases each year)
   const monthlyRent = inputs.monthlyRent * Math.pow(1 + inputs.rentIncreaseRate / 100, year);
-  const yearlyRent = monthlyRent * 12;
+  const annualRent = monthlyRent * 12;
   const rentersInsurance = inputs.rentersInsurance;
-  const totalCost = yearlyRent + rentersInsurance;
+  const totalCost = annualRent + rentersInsurance;
 
   return {
     monthlyRent: Math.round(monthlyRent * 100) / 100,
-    yearlyRent: Math.round(yearlyRent * 100) / 100,
+    annualRent: Math.round(annualRent * 100) / 100,
     rentersInsurance: Math.round(rentersInsurance * 100) / 100,
     totalCost: Math.round(totalCost * 100) / 100,
   };
@@ -431,11 +431,10 @@ export function compareBuyVsRent(inputs: BuyVsRentInputs): BuyVsRentResults {
 
   // Calculate initial values
   const downPayment = inputs.buyInputs.homePrice * inputs.buyInputs.downPaymentPercent / 100;
-  const closingCosts = inputs.buyInputs.homePrice * inputs.buyInputs.closingCostsPercent / 100;
+  const closingCosts = inputs.buyInputs.closingCosts;
 
-  // IMPORTANT: Renters only invest the down payment they saved by not buying
-  // They don't pay closing costs (transfer duty, bond fees, lawyer fees)
-  const renterInitialInvestment = downPayment;
+  // Renters invest the down payment AND closing costs they saved by not buying
+  const renterInitialInvestment = downPayment + closingCosts;
 
   let buyCumulativeCosts = 0;
   let rentCumulativeCosts = 0;
@@ -463,6 +462,8 @@ export function compareBuyVsRent(inputs: BuyVsRentInputs): BuyVsRentResults {
         mortgageBalance: Math.round(initialMortgageBalance * 100) / 100,
         equity: Math.round(initialEquity * 100) / 100,
         yearlyMortgagePayment: 0,
+        yearlyPrincipal: 0,
+        yearlyInterest: 0,
         yearlyPropertyTax: 0,
         yearlyInsurance: 0,
         yearlyHOA: 0,
@@ -476,7 +477,7 @@ export function compareBuyVsRent(inputs: BuyVsRentInputs): BuyVsRentResults {
       rentBreakdown.push({
         year: 0,
         monthlyRent: inputs.rentInputs.monthlyRent,
-        yearlyRent: 0,
+        annualRent: inputs.rentInputs.monthlyRent * 12,
         yearlyRentersInsurance: 0,
         totalYearlyCost: 0,
         cumulativeCosts: 0,
@@ -513,13 +514,36 @@ export function compareBuyVsRent(inputs: BuyVsRentInputs): BuyVsRentResults {
       // Note: pass year-1 to calculateHomeEquity because it expects 0 = first year
       const equity = calculateHomeEquity(inputs.buyInputs, year - 1, currentHomeValue);
 
-      // After mortgage is paid off, invest the mortgage payment
+      // RENT SCENARIO - calculate first to determine who saves money
+      // Note: pass year-1 to calculateRentingCosts because it expects 0 = first year
+      const rentCosts = calculateRentingCosts(inputs.rentInputs, year - 1);
+      rentCumulativeCosts += rentCosts.totalCost;
+
+      // Calculate investment growth comparison
+      // Compare ongoing costs (exclude one-time costs in year 1)
+      let buyYearlyCostForComparison = buyCosts.totalCostExcludingPrincipal;
+      if (year === 1) {
+        buyYearlyCostForComparison -= (buyCosts.downPayment + buyCosts.closingCosts);
+      }
+
+      // After mortgage is paid off, buyer's cost is just ongoing expenses (no mortgage)
       if (year > mortgageTermYears) {
-        // Mortgage is paid off - invest the monthly mortgage payment
-        const previousInvestmentBalance = buyInvestmentBalance;
+        buyYearlyCostForComparison = buyCosts.propertyTax + buyCosts.insurance + buyCosts.hoa + buyCosts.maintenance;
+      }
+
+      const buyMonthlyCost = buyYearlyCostForComparison / 12;
+      const rentMonthlyCost = rentCosts.totalCost / 12;
+
+      // Renter invests when buyer costs more, buyer invests when renter costs more
+      const renterMonthlySavings = Math.max(0, buyMonthlyCost - rentMonthlyCost);
+      const buyerMonthlySavings = Math.max(0, rentMonthlyCost - buyMonthlyCost);
+
+      // Update buyer's investment balance when they save vs renter
+      if (buyerMonthlySavings > 0) {
+        const previousBuyerBalance = buyInvestmentBalance;
         buyInvestmentBalance = calculateInvestmentGrowth(
-          previousInvestmentBalance,
-          monthlyMortgagePayment,
+          previousBuyerBalance,
+          buyerMonthlySavings,
           inputs.investmentReturnRate,
           1
         );
@@ -534,6 +558,8 @@ export function compareBuyVsRent(inputs: BuyVsRentInputs): BuyVsRentResults {
         mortgageBalance: Math.round((currentHomeValue - equity) * 100) / 100,
         equity: Math.round(equity * 100) / 100,
         yearlyMortgagePayment: Math.round(actualMortgagePayment * 100) / 100,
+        yearlyPrincipal: year > mortgageTermYears ? 0 : buyCosts.principalPaid,
+        yearlyInterest: year > mortgageTermYears ? 0 : buyCosts.interestPaid,
         yearlyPropertyTax: buyCosts.propertyTax,
         yearlyInsurance: buyCosts.insurance,
         yearlyHOA: buyCosts.hoa,
@@ -544,29 +570,14 @@ export function compareBuyVsRent(inputs: BuyVsRentInputs): BuyVsRentResults {
         netWorth: Math.round(buyNetWorth * 100) / 100,
       });
 
-      // RENT SCENARIO
-      // Note: pass year-1 to calculateRentingCosts because it expects 0 = first year
-      const rentCosts = calculateRentingCosts(inputs.rentInputs, year - 1);
-      rentCumulativeCosts += rentCosts.totalCost;
-
-      // Calculate investment growth
-      // For year 1, exclude down payment and closing costs from monthly comparison
-      // (those are one-time costs paid at year 0, not ongoing monthly costs)
-      let buyYearlyCostForComparison = buyCosts.totalCostExcludingPrincipal;
-      if (year === 1) {
-        buyYearlyCostForComparison -= (buyCosts.downPayment + buyCosts.closingCosts);
-      }
-      const buyMonthlyCost = buyYearlyCostForComparison / 12;
-      const rentMonthlyCost = rentCosts.totalCost / 12;
-      const monthlySavings = Math.max(0, buyMonthlyCost - rentMonthlyCost);
-
+      // RENTER INVESTMENT
       let investmentBalance: number;
 
       if (year === 1) {
-        // First year: down payment invested at start + monthly savings throughout year
+        // First year: down payment + closing costs invested at start + monthly savings throughout year
         investmentBalance = calculateInvestmentGrowth(
           renterInitialInvestment,
-          monthlySavings,
+          renterMonthlySavings,
           inputs.investmentReturnRate,
           1
         );
@@ -575,7 +586,7 @@ export function compareBuyVsRent(inputs: BuyVsRentInputs): BuyVsRentResults {
         const previousBalance = rentBreakdown[year - 1].investmentBalance;
         investmentBalance = calculateInvestmentGrowth(
           previousBalance,
-          monthlySavings,
+          renterMonthlySavings,
           inputs.investmentReturnRate,
           1
         );
@@ -586,7 +597,7 @@ export function compareBuyVsRent(inputs: BuyVsRentInputs): BuyVsRentResults {
       rentBreakdown.push({
         year: year,
         monthlyRent: rentCosts.monthlyRent,
-        yearlyRent: rentCosts.yearlyRent,
+        annualRent: rentCosts.annualRent,
         yearlyRentersInsurance: rentCosts.rentersInsurance,
         totalYearlyCost: rentCosts.totalCost,
         cumulativeCosts: Math.round(rentCumulativeCosts * 100) / 100,
