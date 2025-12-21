@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { BuyVsRentForm } from '../components/BuyVsRentForm';
 import { BuyVsRentResultsDisplay } from '../components/BuyVsRentResults';
-import { RegionSelector } from '../components/RegionSelector';
 import { BuyVsRentInputs, BuyVsRentResults } from '../types';
 import { compareBuyVsRent } from '../lib/calculations';
 import { useRegional } from '../contexts/RegionalContext';
@@ -45,19 +44,15 @@ const BuyVsRent: React.FC = () => {
     <div className="max-w-6xl mx-auto px-4 py-8 overflow-x-hidden">
       {/* Header */}
       <div className="mb-6 sm:mb-8 opacity-0 animate-fade-in-up">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 mb-4">
-          <Link
-            to="/"
-            className="inline-flex items-center text-text-secondary hover:text-accent-primary transition-colors text-sm sm:text-base"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Home
-          </Link>
-          <RegionSelector />
-        </div>
+        <Link
+          to="/"
+          className="inline-flex items-center text-text-secondary hover:text-accent-primary transition-colors text-sm sm:text-base mb-4"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          Back to Home
+        </Link>
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-text-primary mb-3">
           Buy vs Rent Analysis
-          <span className="text-accent-primary ml-2 sm:ml-3 text-xl sm:text-2xl md:text-3xl">({config.name})</span>
         </h1>
         <p className="text-sm sm:text-base md:text-lg text-text-secondary max-w-3xl">
           Compare the financial impact of buying a home versus renting and investing the difference.
