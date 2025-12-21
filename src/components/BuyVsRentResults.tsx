@@ -39,7 +39,7 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
 
   // Calculate one-time costs
   const downPayment = inputs.buyInputs.homePrice * (inputs.buyInputs.downPaymentPercent / 100);
-  const closingCosts = inputs.buyInputs.homePrice * (inputs.buyInputs.closingCostsPercent / 100);
+  const closingCosts = inputs.buyInputs.closingCosts;
 
   // Calculate total ongoing costs for buying (sum across all years)
   const totalMortgagePayments = results.buyBreakdown.reduce((sum, year) => sum + year.yearlyMortgagePayment, 0);
@@ -54,19 +54,19 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
   const finalYearData = results.buyBreakdown[results.buyBreakdown.length - 1];
   const nextYearHomeValue = finalYearData.homeValue * (1 + inputs.buyInputs.appreciationRate / 100);
 
-  // Property tax and maintenance are based on home value
-  const nextYearPropertyTax = (nextYearHomeValue * inputs.buyInputs.propertyTaxRate / 100) / 12;
-  const nextYearMaintenance = (nextYearHomeValue * inputs.buyInputs.maintenanceRate / 100) / 12;
+  // Property tax and maintenance are based on home value (annual)
+  const nextYearPropertyTax = nextYearHomeValue * inputs.buyInputs.propertyTaxRate / 100;
+  const nextYearMaintenance = nextYearHomeValue * inputs.buyInputs.maintenanceRate / 100;
 
-  // Insurance and HOA stay the same (or we could apply inflation, but keeping simple)
-  const nextYearInsurance = inputs.buyInputs.homeInsurance / 12;
+  // Insurance and HOA (annual values)
+  const nextYearInsurance = nextYearHomeValue * inputs.buyInputs.homeInsuranceRate / 100;
   const nextYearHOA = inputs.buyInputs.hoaFees;
 
-  const nextYearTotalMonthly = nextYearPropertyTax + nextYearInsurance + nextYearHOA + nextYearMaintenance;
+  const nextYearTotalAnnual = nextYearPropertyTax + nextYearInsurance + nextYearHOA + nextYearMaintenance;
 
   // Calculate renter totals
-  const totalRentPaid = results.rentBreakdown.reduce((sum, year) => sum + year.yearlyRent, 0);
-  const renterInitialInvestment = downPayment;
+  const totalRentPaid = results.rentBreakdown.reduce((sum, year) => sum + year.annualRent, 0);
+  const renterInitialInvestment = downPayment + closingCosts;
 
   // Calculate total investment contributions (sum of monthly savings over 20 years)
   // For each year: contributions = (buy costs - rent costs) invested
@@ -92,19 +92,45 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
       buyCostsForYear = buyYear.totalYearlyCost - downPayment - closingCosts;
     }
 
-    const rentCostsForYear = rentYear.yearlyRent + rentYear.yearlyRentersInsurance;
+    const rentCostsForYear = rentYear.annualRent + rentYear.yearlyRentersInsurance;
     const yearlyContribution = Math.max(0, buyCostsForYear - rentCostsForYear);
     totalInvestmentContributions += yearlyContribution;
   }
 
-  // Calculate investment totals
+  // Calculate renter investment totals
   const totalInvestmentBalance = results.rentBreakdown[results.rentBreakdown.length - 1].investmentBalance;
   const totalMoneyInvested = renterInitialInvestment + totalInvestmentContributions;
   const totalInvestmentGrowth = totalInvestmentBalance - totalMoneyInvested;
 
+  // Calculate buyer's investment contributions (when rent > buy costs)
+  // Use interest-only costs (excluding principal) since principal builds equity
+  let buyerTotalContributions = 0;
+  for (let i = 0; i < results.buyBreakdown.length; i++) {
+    const buyYear = results.buyBreakdown[i];
+    const rentYear = results.rentBreakdown[i];
+
+    if (buyYear.year === 0) continue;
+
+    // Use interest-only (not full mortgage) since principal builds equity
+    // This matches the core calculation logic in calculations.ts
+    const buyCostsForYear = buyYear.yearlyInterest + buyYear.yearlyPropertyTax +
+                            buyYear.yearlyInsurance + buyYear.yearlyHOA + buyYear.yearlyMaintenance;
+
+    const rentCostsForYear = rentYear.annualRent + rentYear.yearlyRentersInsurance;
+
+    // Buyer invests when their costs are less than renter's
+    const buyerYearlyContribution = Math.max(0, rentCostsForYear - buyCostsForYear);
+    buyerTotalContributions += buyerYearlyContribution;
+  }
+
+  // Calculate buyer investment totals
+  const buyerInvestmentBalance = results.buyBreakdown[results.buyBreakdown.length - 1].investmentBalance;
+  const buyerInvestmentGrowth = buyerInvestmentBalance - buyerTotalContributions;
+
   // Calculate next year rent (after time horizon years of increases)
   const finalMonthlyRent = results.rentBreakdown[results.rentBreakdown.length - 1].monthlyRent;
   const nextYearMonthlyRent = finalMonthlyRent * (1 + inputs.rentInputs.rentIncreaseRate / 100);
+  const nextYearAnnualRent = nextYearMonthlyRent * 12;
 
   return (
     <div className={`space-y-8 sm:space-y-12 overflow-x-hidden ${className}`}>
@@ -229,12 +255,12 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
               </div>
             </div>
 
-            {/* Monthly Costs After Mortgage Paid Off */}
+            {/* Annual Costs After Mortgage Paid Off */}
             <div className="space-y-2 sm:space-y-3">
-              <div className="label text-accent-primary uppercase tracking-wider text-xs">Monthly Costs (After Paid Off)</div>
+              <div className="label text-accent-primary uppercase tracking-wider text-xs">Annual Costs (After Paid Off)</div>
               <div className="bg-bg-elevated rounded-md p-3 sm:p-4 space-y-2">
                 <div className="flex justify-between items-baseline text-xs sm:text-sm">
-                  <span className="text-text-secondary">Mortgage Payment</span>
+                  <span className="text-text-secondary">Bond Payment</span>
                   <span className="font-mono text-success">
                     {currency.format(0, false)}
                   </span>
@@ -253,7 +279,7 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
                 </div>
                 {nextYearHOA > 0 && (
                   <div className="flex justify-between items-baseline text-xs sm:text-sm">
-                    <span className="text-text-secondary">HOA/Levies</span>
+                    <span className="text-text-secondary">Levies</span>
                     <span className="font-mono text-text-primary">
                       {currency.format(nextYearHOA, false)}
                     </span>
@@ -266,9 +292,9 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
                   </span>
                 </div>
                 <div className="flex justify-between items-baseline text-xs sm:text-sm pt-2 border-t border-border-subtle font-semibold">
-                  <span className="text-text-primary">Total Monthly</span>
+                  <span className="text-text-primary">Total Annual</span>
                   <span className="font-mono text-text-primary">
-                    {currency.format(nextYearTotalMonthly, false)}
+                    {currency.format(nextYearTotalAnnual, false)}
                   </span>
                 </div>
               </div>
@@ -341,13 +367,27 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
                     {currency.format(results.buyBreakdown[results.buyBreakdown.length - 1].equity, false)}
                   </span>
                 </div>
-                {results.buyBreakdown[results.buyBreakdown.length - 1].investmentBalance > 0 && (
-                  <div className="flex justify-between items-baseline text-xs sm:text-sm">
-                    <span className="text-text-secondary">Investment Balance</span>
-                    <span className="font-mono text-success">
-                      {currency.format(results.buyBreakdown[results.buyBreakdown.length - 1].investmentBalance, false)}
-                    </span>
-                  </div>
+                {buyerInvestmentBalance > 0 && (
+                  <>
+                    <div className="flex justify-between items-baseline text-xs sm:text-sm pt-2 border-t border-border-subtle">
+                      <span className="text-text-secondary">Monthly Contributions</span>
+                      <span className="font-mono text-text-primary">
+                        {currency.format(buyerTotalContributions, false)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-baseline text-xs sm:text-sm">
+                      <span className="text-text-secondary">Investment Growth</span>
+                      <span className="font-mono text-success">
+                        {currency.format(buyerInvestmentGrowth, false)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-baseline text-xs sm:text-sm">
+                      <span className="text-text-secondary">Total Investment Value</span>
+                      <span className="font-mono text-text-primary">
+                        {currency.format(buyerInvestmentBalance, false)}
+                      </span>
+                    </div>
+                  </>
                 )}
                 <div className="flex justify-between items-baseline text-xs sm:text-sm pt-2 border-t border-border-subtle font-semibold">
                   <span className="text-accent-primary">NET WORTH</span>
@@ -377,20 +417,20 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
               <div className="label text-accent-light uppercase tracking-wider text-xs">Initial Investment</div>
               <div className="bg-bg-elevated rounded-md p-3 sm:p-4 space-y-2">
                 <div className="flex justify-between items-baseline text-xs sm:text-sm">
-                  <span className="text-text-secondary">Down Payment Saved</span>
+                  <span className="text-text-secondary">Once Off Cost Saved</span>
                   <span className="font-mono text-text-primary">
                     {currency.format(renterInitialInvestment, false)}
                   </span>
                 </div>
                 <div className="flex justify-between items-baseline text-xs sm:text-sm text-text-tertiary">
-                  <span className="text-xs italic">Invested immediately instead of buying</span>
+                  <span className="text-xs italic">Invested immediately instead of buying - Down Payment + Closing Cost</span>
                 </div>
               </div>
             </div>
 
-            {/* Monthly Costs After Time Horizon */}
+            {/* Monthly Rent After Time Horizon */}
             <div className="space-y-2 sm:space-y-3">
-              <div className="label text-accent-light uppercase tracking-wider text-xs">Monthly Cost (Year {timeHorizon + 1})</div>
+              <div className="label text-accent-light uppercase tracking-wider text-xs">Monthly Rent (Year {timeHorizon + 1})</div>
               <div className="bg-bg-elevated rounded-md p-3 sm:p-4 space-y-2">
                 <div className="flex justify-between items-baseline text-xs sm:text-sm">
                   <span className="text-text-secondary">Monthly Rent</span>
@@ -399,9 +439,9 @@ export const BuyVsRentResultsDisplay: React.FC<BuyVsRentResultsProps> = ({
                   </span>
                 </div>
                 <div className="flex justify-between items-baseline text-xs sm:text-sm pt-2 border-t border-border-subtle font-semibold">
-                  <span className="text-text-primary">Total Monthly</span>
+                  <span className="text-text-primary">Annual Total</span>
                   <span className="font-mono text-text-primary">
-                    {currency.format(nextYearMonthlyRent, false)}
+                    {currency.format(nextYearAnnualRent, false)}
                   </span>
                 </div>
               </div>
