@@ -46,18 +46,18 @@ export interface BuyScenarioInputs {
   interestRate: number;             // Annual mortgage interest rate (e.g., 6.5 for 6.5%)
   loanTermYears: number;            // Mortgage term in years (typically 15 or 30)
   propertyTaxRate: number;          // Annual property tax as percentage of home value (e.g., 1.2 for 1.2%)
-  homeInsurance: number;            // Annual home insurance cost in dollars
-  hoaFees: number;                  // Monthly HOA fees in dollars
+  homeInsuranceRate: number;        // Annual home insurance as percentage of home value (e.g., 0.5 for 0.5%)
+  hoaFees: number;                  // Annual HOA/levy fees
   maintenanceRate: number;          // Annual maintenance as percentage of home value (e.g., 1 for 1%)
   appreciationRate: number;         // Annual home appreciation rate (e.g., 3 for 3%)
-  closingCostsPercent: number;      // Closing costs as percentage of home price (e.g., 3 for 3%)
+  closingCosts: number;             // Transfer duty + bond registration + legal fees (currency)
   sellingCostsPercent: number;      // Selling costs as percentage of sale price (e.g., 6 for 6%)
 }
 
 export interface RentScenarioInputs {
   monthlyRent: number;              // Initial monthly rent
   rentIncreaseRate: number;         // Annual rent increase rate (e.g., 3 for 3%)
-  rentersInsurance: number;         // Annual renters insurance cost in dollars
+  rentersInsurance: number;         // Annual renters insurance cost
 }
 
 export interface BuyVsRentInputs {
@@ -73,6 +73,8 @@ export interface BuyYearlyBreakdown {
   mortgageBalance: number;          // Remaining mortgage balance
   equity: number;                   // Home equity (value - balance)
   yearlyMortgagePayment: number;    // Total mortgage payments for the year
+  yearlyPrincipal: number;          // Principal portion of mortgage payment (builds equity)
+  yearlyInterest: number;           // Interest portion of mortgage payment (true cost)
   yearlyPropertyTax: number;        // Property tax for the year
   yearlyInsurance: number;          // Home insurance for the year
   yearlyHOA: number;                // HOA fees for the year
@@ -86,7 +88,7 @@ export interface BuyYearlyBreakdown {
 export interface RentYearlyBreakdown {
   year: number;
   monthlyRent: number;              // Monthly rent for this year
-  yearlyRent: number;               // Total rent for the year
+  annualRent: number;               // Annual rent for this year (monthly * 12)
   yearlyRentersInsurance: number;   // Renters insurance for the year
   totalYearlyCost: number;          // Total renting costs for the year
   cumulativeCosts: number;          // Total rent paid from year 0 to this year

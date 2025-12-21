@@ -37,8 +37,7 @@ export const southAfricaConfig: RegionalConfig = {
     propertyTax: 'Municipal Rates',
     propertyTaxRate: 'Municipal Rates (%)',
     hoaFees: 'Levies (Body Corporate)',
-    closingCosts: 'Transfer Duty & Fees',
-    closingCostsPercent: 'Transfer Fees (%)',
+    closingCosts: 'Transfer & Bond Fees',
     sellingCosts: 'Estate Agent Commission',
     sellingCostsPercent: 'Agent Commission (%)',
     homeInsurance: 'Home Insurance',
@@ -55,17 +54,17 @@ export const southAfricaConfig: RegionalConfig = {
       interestRate: 11.75,          // Prime lending rate Nov 2024
       loanTermYears: 20,            // 20 years is common, 30 available
       propertyTaxRate: 0.8,         // ~0.8% varies by municipality
-      homeInsurance: 12000,         // R12,000/year approximate
-      hoaFees: 1500,                // R1,500/month levies (if applicable)
+      homeInsuranceRate: 0.5,       // ~0.5% of home value
+      hoaFees: 0,                   // Annual levies (0 if not in complex)
       maintenanceRate: 1.0,         // 1% of property value
       appreciationRate: 5.5,        // ~5-6% historical average
-      closingCostsPercent: 5.5,     // Transfer duty (~2.7% at R2.5M) + bond registration (~1.5%) + legal fees (~1-2%)
+      closingCosts: 137500,         // Transfer duty (~R67k) + bond registration (~R50k) + legal fees (~R20k)
       sellingCostsPercent: 7.5,     // 7.5% estate agent + VAT
     },
     rentInputs: {
-      monthlyRent: 12000,           // R12,000/month - similar to bond payment
+      monthlyRent: 12000,           // ~5.8% rental yield
       rentIncreaseRate: 6,          // CPI + 1-2% typically
-      rentersInsurance: 1200,       // R1,200/year approximate
+      rentersInsurance: 0,          // Not common in SA
     },
     investmentReturnRate: 12,       // JSE All Share historical ~12%
     timeHorizonYears: 20,
@@ -111,7 +110,7 @@ export const southAfricaConfig: RegionalConfig = {
     propertyTaxRate: 'Municipal rates vary by municipality. Typically 0.5-1.5% of property value annually. Check your municipal valuation.',
     appreciationRate: 'Historical property appreciation in SA averages 5-6%, but varies significantly by region (Western Cape, Gauteng, etc.).',
     investmentReturnRate: 'JSE All Share Index has returned ~12% historically. Consider inflation (~5%) for real returns of ~7%.',
-    closingCosts: 'Includes transfer duty (progressive: 0% up to R1.21M, then 3-13% on amounts above), bond registration fees (~1.5%), and conveyancer costs. For R2.5M property: ~R67k transfer duty + ~R70k other fees = ~R137k total (5.5%).',
+    closingCosts: 'Transfer duty brackets: R0-R1.21M = 0%, R1.21M-R1.66M = 3%, R1.66M-R2.33M = 6%, R2.33M-R2.99M = 8%, R2.99M-R13.31M = 11%, above = 13%. Plus bond registration (~R50k) and legal fees (~R20k).',
     sellingCosts: 'Estate agent commission is typically 7.5% (6.5% + VAT) in South Africa, plus bond cancellation fees.',
     maintenanceRate: 'Industry standard is 1% of property value per year for maintenance. Older homes may require more.',
   },

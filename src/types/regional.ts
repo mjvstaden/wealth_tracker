@@ -17,7 +17,6 @@ export interface RegionalTerminology {
   propertyTaxRate: string;
   hoaFees: string;
   closingCosts: string;
-  closingCostsPercent: string;
   sellingCosts: string;
   sellingCostsPercent: string;
   homeInsurance: string;
@@ -34,11 +33,11 @@ export interface RegionalDefaults {
     interestRate: number;
     loanTermYears: number;
     propertyTaxRate: number;
-    homeInsurance: number;
+    homeInsuranceRate: number;
     hoaFees: number;
     maintenanceRate: number;
     appreciationRate: number;
-    closingCostsPercent: number;
+    closingCosts: number;
     sellingCostsPercent: number;
   };
   rentInputs: {

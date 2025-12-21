@@ -38,7 +38,6 @@ export const unitedStatesConfig: RegionalConfig = {
     propertyTaxRate: 'Property Tax Rate (%)',
     hoaFees: 'HOA Fees',
     closingCosts: 'Closing Costs',
-    closingCostsPercent: 'Closing Costs (%)',
     sellingCosts: 'Realtor Fees & Costs',
     sellingCostsPercent: 'Selling Costs (%)',
     homeInsurance: 'Home Insurance',
@@ -55,11 +54,11 @@ export const unitedStatesConfig: RegionalConfig = {
       interestRate: 6.75,           // ~6.75% mortgage rate Nov 2024
       loanTermYears: 30,            // 30-year mortgage is standard
       propertyTaxRate: 1.2,         // ~1.2% national average
-      homeInsurance: 1500,          // $1,500/year average
+      homeInsuranceRate: 0.35,      // ~0.35% of home value ($1,400/year for $400k)
       hoaFees: 0,                   // $0 default (not all properties have HOA)
       maintenanceRate: 1.0,         // 1% of property value
       appreciationRate: 3.5,        // ~3.5% historical average
-      closingCostsPercent: 3,       // 2-5% typical
+      closingCosts: 12000,          // ~3% of $400k = $12k
       sellingCostsPercent: 6,       // 6% realtor commission standard
     },
     rentInputs: {
