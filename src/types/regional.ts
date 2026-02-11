@@ -1,9 +1,4 @@
-/**
- * Regional configuration types for True North
- * Supports South Africa and United States
- */
-
-export type Region = 'ZA' | 'US';
+export type Region = 'ZA';
 
 export interface CurrencyConfig {
   symbol: string;

@@ -1,108 +1,66 @@
-/**
- * Type definitions for True North Wealth Analytics
- */
-
-export interface Scenario {
-  id: string;
-  name: string;
-  type: 'buy-vs-rent' | 'car-vs-invest' | 'contribution' | 'custom';
-  scenarioA: ScenarioDetails;
-  scenarioB: ScenarioDetails;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface ScenarioDetails {
-  label: string;
-  initialAmount: number;
-  monthlyAmount: number;
-  returnRate: number;
-  timeHorizon: number;
-}
-
-export interface CalculationResult {
-  scenarioA: YearlyBreakdown[];
-  scenarioB: YearlyBreakdown[];
-  difference: number;
-  summary: string;
-}
-
-export interface YearlyBreakdown {
-  year: number;
-  totalValue: number;
-  totalContributed: number;
-  totalGrowth: number;
-}
-
-export type ScenarioType = 'buy-vs-rent' | 'car-vs-invest' | 'contribution' | 'custom';
-
-/**
- * Buy vs Rent Calculation Types
- */
-
 export interface BuyScenarioInputs {
-  homePrice: number;                // Total home price
-  downPaymentPercent: number;       // Down payment as percentage (e.g., 20 for 20%)
-  interestRate: number;             // Annual mortgage interest rate (e.g., 6.5 for 6.5%)
-  loanTermYears: number;            // Mortgage term in years (typically 15 or 30)
-  propertyTaxRate: number;          // Annual property tax as percentage of home value (e.g., 1.2 for 1.2%)
-  homeInsuranceRate: number;        // Annual home insurance as percentage of home value (e.g., 0.5 for 0.5%)
-  hoaFees: number;                  // Annual HOA/levy fees
-  maintenanceRate: number;          // Annual maintenance as percentage of home value (e.g., 1 for 1%)
-  appreciationRate: number;         // Annual home appreciation rate (e.g., 3 for 3%)
-  closingCosts: number;             // Transfer duty + bond registration + legal fees (currency)
-  sellingCostsPercent: number;      // Selling costs as percentage of sale price (e.g., 6 for 6%)
+  homePrice: number;
+  downPaymentPercent: number;
+  interestRate: number;
+  loanTermYears: number;
+  propertyTaxRate: number;
+  homeInsuranceRate: number;
+  hoaFees: number;
+  maintenanceRate: number;
+  appreciationRate: number;
+  closingCosts: number;
+  sellingCostsPercent: number;
 }
 
 export interface RentScenarioInputs {
-  monthlyRent: number;              // Initial monthly rent
-  rentIncreaseRate: number;         // Annual rent increase rate (e.g., 3 for 3%)
-  rentersInsurance: number;         // Annual renters insurance cost
+  monthlyRent: number;
+  rentIncreaseRate: number;
+  rentersInsurance: number;
 }
 
 export interface BuyVsRentInputs {
   buyInputs: BuyScenarioInputs;
   rentInputs: RentScenarioInputs;
-  investmentReturnRate: number;    // Annual return rate for invested savings (e.g., 7 for 7%)
-  timeHorizonYears: number;         // Analysis period in years
+  investmentReturnRate: number;
+  timeHorizonYears: number;
 }
 
 export interface BuyYearlyBreakdown {
   year: number;
-  homeValue: number;                // Current home value with appreciation
-  mortgageBalance: number;          // Remaining mortgage balance
-  equity: number;                   // Home equity (value - balance)
-  yearlyMortgagePayment: number;    // Total mortgage payments for the year
-  yearlyPrincipal: number;          // Principal portion of mortgage payment (builds equity)
-  yearlyInterest: number;           // Interest portion of mortgage payment (true cost)
-  yearlyPropertyTax: number;        // Property tax for the year
-  yearlyInsurance: number;          // Home insurance for the year
-  yearlyHOA: number;                // HOA fees for the year
-  yearlyMaintenance: number;        // Maintenance costs for the year
-  totalYearlyCost: number;          // Sum of all costs for the year
-  cumulativeCosts: number;          // Total costs paid from year 0 to this year
-  investmentBalance: number;        // Investment balance (grows after mortgage is paid off)
-  netWorth: number;                 // Equity + investment balance
+  homeValue: number;
+  mortgageBalance: number;
+  equity: number;
+  yearlyMortgagePayment: number;
+  yearlyPrincipal: number;
+  yearlyInterest: number;
+  yearlyPropertyTax: number;
+  yearlyInsurance: number;
+  yearlyHOA: number;
+  yearlyMaintenance: number;
+  totalYearlyCost: number;
+  cumulativeCosts: number;
+  investmentBalance: number;
+  netWorth: number;
 }
 
 export interface RentYearlyBreakdown {
   year: number;
-  monthlyRent: number;              // Monthly rent for this year
-  annualRent: number;               // Annual rent for this year (monthly * 12)
-  yearlyRentersInsurance: number;   // Renters insurance for the year
-  totalYearlyCost: number;          // Total renting costs for the year
-  cumulativeCosts: number;          // Total rent paid from year 0 to this year
-  investmentBalance: number;        // Value of invested savings
-  netWorth: number;                 // Investment balance - cumulative costs
+  monthlyRent: number;
+  annualRent: number;
+  yearlyRentersInsurance: number;
+  totalYearlyCost: number;
+  cumulativeCosts: number;
+  investmentBalance: number;
+  netWorth: number;
 }
 
 export interface BuyVsRentResults {
   buyBreakdown: BuyYearlyBreakdown[];
   rentBreakdown: RentYearlyBreakdown[];
-  breakEvenYear: number | null;    // Year when net worths are equal (null if never)
-  finalBuyNetWorth: number;         // Final net worth if buying
-  finalRentNetWorth: number;        // Final net worth if renting
-  difference: number;               // Rent net worth - Buy net worth (positive means renting is better)
+  breakEvenYear: number | null;
+  finalBuyNetWorth: number;
+  finalRentNetWorth: number;
+  difference: number;
   betterChoice: 'buy' | 'rent';
-  summary: string;                  // Plain English explanation
+  summary: string;
 }

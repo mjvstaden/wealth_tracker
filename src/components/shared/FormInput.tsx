@@ -47,6 +47,7 @@ export const FormInput: React.FC<FormInputProps> = ({
     if (!isFocused) {
       setInputValue(getDisplayValue());
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value, isFocused]);
 
   const formatWithSeparators = (numValue: number): string => {

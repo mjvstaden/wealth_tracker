@@ -4,9 +4,6 @@
  */
 
 import {
-  ScenarioDetails,
-  YearlyBreakdown,
-  CalculationResult,
   BuyScenarioInputs,
   RentScenarioInputs,
   BuyVsRentInputs,
@@ -42,66 +39,6 @@ export function calculateFutureValue(
     : monthlyContribution * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
 
   return fvPrincipal + fvContributions;
-}
-
-/**
- * Generate year-by-year breakdown of scenario
- */
-export function generateYearlyBreakdown(
-  scenario: ScenarioDetails
-): YearlyBreakdown[] {
-  const breakdown: YearlyBreakdown[] = [];
-
-  for (let year = 1; year <= scenario.timeHorizon; year++) {
-    const totalValue = calculateFutureValue(
-      scenario.initialAmount,
-      scenario.monthlyAmount,
-      scenario.returnRate,
-      year
-    );
-
-    const totalContributed = scenario.initialAmount + (scenario.monthlyAmount * 12 * year);
-    const totalGrowth = totalValue - totalContributed;
-
-    breakdown.push({
-      year,
-      totalValue: Math.round(totalValue * 100) / 100,
-      totalContributed: Math.round(totalContributed * 100) / 100,
-      totalGrowth: Math.round(totalGrowth * 100) / 100,
-    });
-  }
-
-  return breakdown;
-}
-
-/**
- * Compare two scenarios and generate results
- */
-export function compareScenarios(
-  scenarioA: ScenarioDetails,
-  scenarioB: ScenarioDetails
-): CalculationResult {
-  const breakdownA = generateYearlyBreakdown(scenarioA);
-  const breakdownB = generateYearlyBreakdown(scenarioB);
-
-  const finalValueA = breakdownA[breakdownA.length - 1].totalValue;
-  const finalValueB = breakdownB[breakdownB.length - 1].totalValue;
-  const difference = finalValueB - finalValueA;
-
-  // Generate plain English summary
-  const betterScenario = difference > 0 ? scenarioB.label : scenarioA.label;
-  const worseScenario = difference > 0 ? scenarioA.label : scenarioB.label;
-  const absDifference = Math.abs(difference);
-  const timeHorizon = scenarioA.timeHorizon;
-
-  const summary = `If you choose "${betterScenario}" instead of "${worseScenario}", you'll have $${absDifference.toLocaleString()} more after ${timeHorizon} years.`;
-
-  return {
-    scenarioA: breakdownA,
-    scenarioB: breakdownB,
-    difference: Math.round(difference * 100) / 100,
-    summary,
-  };
 }
 
 /**
@@ -206,36 +143,6 @@ export function calculateMortgageAmortization(
   }
 
   return schedule;
-}
-
-/**
- * Calculate South African transfer duty using progressive brackets
- *
- * Transfer duty brackets (2024):
- * - R0 - R1,210,000: 0%
- * - R1,210,001 - R1,663,800: 3% of value above R1,210,000
- * - R1,663,801 - R2,329,300: R13,614 + 6% of value above R1,663,800
- * - R2,329,301 - R2,994,800: R53,544 + 8% of value above R2,329,300
- * - R2,994,801 - R13,310,000: R106,784 + 11% of value above R2,994,800
- * - R13,310,001+: R1,241,456 + 13% of value above R13,310,000
- *
- * @param propertyValue - Property value in Rands
- * @returns Transfer duty amount
- */
-export function calculateSATransferDuty(propertyValue: number): number {
-  if (propertyValue <= 1210000) {
-    return 0;
-  } else if (propertyValue <= 1663800) {
-    return (propertyValue - 1210000) * 0.03;
-  } else if (propertyValue <= 2329300) {
-    return 13614 + (propertyValue - 1663800) * 0.06;
-  } else if (propertyValue <= 2994800) {
-    return 53544 + (propertyValue - 2329300) * 0.08;
-  } else if (propertyValue <= 13310000) {
-    return 106784 + (propertyValue - 2994800) * 0.11;
-  } else {
-    return 1241456 + (propertyValue - 13310000) * 0.13;
-  }
 }
 
 /**
@@ -440,13 +347,7 @@ export function compareBuyVsRent(inputs: BuyVsRentInputs): BuyVsRentResults {
   let rentCumulativeCosts = 0;
   let buyInvestmentBalance = 0; // Buyer's investment balance after mortgage is paid off
 
-  // Calculate when mortgage is paid off
   const mortgageTermYears = inputs.buyInputs.loanTermYears;
-  const monthlyMortgagePayment = calculateMonthlyMortgage(
-    inputs.buyInputs.homePrice - downPayment,
-    inputs.buyInputs.interestRate,
-    mortgageTermYears
-  );
 
   // Year-by-year breakdown (starting from year 0)
   for (let year = 0; year <= inputs.timeHorizonYears; year++) {
@@ -777,127 +678,3 @@ export function calculateBondRegistrationFees(bondAmount: number): number {
   return Math.round(fee);
 }
 
-/**
- * Calculate South African deeds office fees
- * Based on the property value
- *
- * This is an approximation of deeds office fees, which follow a similar
- * progressive scale to bond registration fees. Actual fees vary by province
- * and may include additional administrative costs.
- *
- * Fee scale (approximate):
- * - Up to R 600,000: 1% of property value
- * - R 600,001 - R 1,500,000: R 6,000 + 0.5% of amount above R 600,000
- * - Above R 1,500,000: R 10,500 + 0.25% of amount above R 1,500,000
- *
- * Edge cases:
- * - Zero or negative property value returns 0
- *
- * @param propertyValue - Property value in ZAR
- * @returns Deeds office fee in ZAR (rounded to nearest Rand)
- *
- * @example
- * // R 500,000 property
- * calculateDeedsOfficeFees(500_000); // Returns R 5,000 (1% of R 500,000)
- *
- * @example
- * // R 2,000,000 property
- * calculateDeedsOfficeFees(2_000_000); // Returns R 11,750
- */
-export function calculateDeedsOfficeFees(propertyValue: number): number {
-  // Handle edge cases
-  if (propertyValue <= 0) return 0;
-
-  let fee = 0;
-
-  // Up to R 600,000: 1%
-  if (propertyValue <= 600_000) {
-    fee = propertyValue * 0.01;
-  }
-  // R 600,001 - R 1,500,000: R 6,000 + 0.5% above R 600,000
-  else if (propertyValue <= 1_500_000) {
-    fee = 6_000 + (propertyValue - 600_000) * 0.005;
-  }
-  // Above R 1,500,000: R 10,500 + 0.25% above R 1,500,000
-  else {
-    fee = 10_500 + (propertyValue - 1_500_000) * 0.0025;
-  }
-
-  // Round to nearest Rand
-  return Math.round(fee);
-}
-
-/**
- * Calculate total South African property purchase fees
- * Includes all costs when purchasing property in South Africa
- *
- * Components:
- * - Transfer duty: Progressive tax on property value (only if applicable)
- * - Bond registration fee: Cost to register the mortgage bond (0 if cash purchase)
- * - Deeds office fee: Cost to transfer property ownership
- *
- * Note: Transfer duty is NOT paid if purchasing with a bond from a bank
- * (bank purchases are VAT-exempt but don't pay transfer duty on new builds)
- * This function calculates transfer duty for non-VAT properties only.
- *
- * Assumptions:
- * - Property is existing (not new build subject to VAT)
- * - Fees are based on 2024 rates
- * - Does not include conveyancing attorney fees (variable)
- * - Does not include bank initiation fees (variable)
- *
- * @param propertyValue - Property value in ZAR
- * @param bondAmount - Mortgage bond amount in ZAR (0 if cash purchase)
- * @returns Object with breakdown of all fees
- *
- * @example
- * // R 2,000,000 property with R 1,600,000 bond (20% down payment)
- * calculateSouthAfricanPurchaseFees(2_000_000, 1_600_000);
- * // Returns {
- * //   transferDuty: 38_775,
- * //   bondRegistrationFee: 16_600,
- * //   deedsOfficeFee: 11_750,
- * //   totalFees: 67_125
- * // }
- *
- * @example
- * // R 1,000,000 cash purchase (no bond)
- * calculateSouthAfricanPurchaseFees(1_000_000, 0);
- * // Returns {
- * //   transferDuty: 0,
- * //   bondRegistrationFee: 0,
- * //   deedsOfficeFee: 10_000,
- * //   totalFees: 10_000
- * // }
- */
-export function calculateSouthAfricanPurchaseFees(
-  propertyValue: number,
-  bondAmount: number
-): {
-  transferDuty: number;
-  bondRegistrationFee: number;
-  deedsOfficeFee: number;
-  totalFees: number;
-} {
-  // Handle edge cases
-  if (propertyValue <= 0) {
-    return {
-      transferDuty: 0,
-      bondRegistrationFee: 0,
-      deedsOfficeFee: 0,
-      totalFees: 0,
-    };
-  }
-
-  const transferDuty = calculateTransferDuty(propertyValue);
-  const bondRegistrationFee = calculateBondRegistrationFees(bondAmount);
-  const deedsOfficeFee = calculateDeedsOfficeFees(propertyValue);
-  const totalFees = transferDuty + bondRegistrationFee + deedsOfficeFee;
-
-  return {
-    transferDuty,
-    bondRegistrationFee,
-    deedsOfficeFee,
-    totalFees,
-  };
-}

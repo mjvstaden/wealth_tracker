@@ -11,7 +11,7 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <RegionalProvider defaultRegion="ZA">
+    <RegionalProvider>
       <App />
     </RegionalProvider>
   </React.StrictMode>
