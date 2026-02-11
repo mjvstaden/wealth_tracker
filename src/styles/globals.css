@@ -172,6 +172,33 @@
   .nav-link-active {
     @apply text-text-primary;
   }
+
+  /* Hero Input Card - Prominent primary inputs */
+  .hero-input-card {
+    @apply bg-bg-secondary border border-border-default rounded-lg p-5 sm:p-6;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hero-input-card:focus-within {
+    @apply border-accent-primary;
+    box-shadow: 0 0 0 1px rgba(14, 165, 233, 0.2), 0 4px 24px rgba(14, 165, 233, 0.08);
+  }
+
+  .hero-input-label {
+    @apply flex items-center gap-3 mb-4 text-sm font-semibold text-text-secondary uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* Override input styling inside hero cards for a cleaner look */
+  .hero-input-field .input {
+    @apply border-transparent bg-bg-primary/50 text-lg sm:text-xl py-4 sm:py-5;
+    font-size: 1.25rem;
+  }
+
+  .hero-input-field .input:focus {
+    @apply border-transparent;
+    box-shadow: none;
+  }
 }
 
 @layer utilities {

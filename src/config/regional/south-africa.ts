@@ -62,7 +62,7 @@ export const southAfricaConfig: RegionalConfig = {
       sellingCostsPercent: 7.5,     // 7.5% estate agent + VAT
     },
     rentInputs: {
-      monthlyRent: 12000,           // ~5.8% rental yield
+      monthlyRent: 16500,           // ~8% rental yield
       rentIncreaseRate: 6,          // CPI + 1-2% typically
       rentersInsurance: 0,          // Not common in SA
     },

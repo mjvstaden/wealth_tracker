@@ -1,117 +1,81 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Calculator, TrendingUp, Home as HomeIcon, Car, PiggyBank } from 'lucide-react';
+import { ArrowRight, Home as HomeIcon, Car, PiggyBank } from 'lucide-react';
 
 const Home: React.FC = () => {
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 sm:py-12">
-      {/* Hero Section */}
-      <div className="text-center mb-12 sm:mb-16 opacity-0 animate-fade-in-up">
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-text-primary mb-4">
-          Navigate Your Financial Future with Clarity
+    <div className="max-w-5xl mx-auto px-4 sm:px-6">
+
+      {/* Hero */}
+      <div className="text-center pt-16 sm:pt-24 pb-16 sm:pb-20 opacity-0 animate-fade-in-up">
+        <p className="text-xs sm:text-sm font-semibold uppercase tracking-widest text-accent-primary mb-4">
+          Wealth Analytics
+        </p>
+        <h1 className="font-display text-3xl sm:text-5xl md:text-6xl font-bold text-text-primary mb-5 leading-[1.1]">
+          See how today's choices<br className="hidden sm:block" /> shape your wealth
         </h1>
-        <p className="text-base sm:text-lg text-text-secondary mb-6 sm:mb-8 max-w-2xl mx-auto">
-          Compare financial scenarios side-by-side and see the long-term impact of your decisions.
-          No guesswork, just clear insights.
+        <p className="text-base sm:text-lg text-text-secondary max-w-xl mx-auto mb-8">
+          Model financial decisions over 20-40 years. No sign-up, no fluff &mdash; just clear numbers.
         </p>
         <Link
           to="/buy-vs-rent"
-          className="btn-primary inline-flex items-center"
+          className="btn-primary inline-flex items-center gap-2 text-sm"
         >
-          <Calculator className="w-5 h-5 mr-2" />
-          Start Comparing Scenarios
+          Buy vs Rent Calculator
+          <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
 
-      {/* Features/Templates */}
-      <div className="mb-12 sm:mb-16 opacity-0 animate-fade-in-up stagger-1">
-        <h2 className="text-xl sm:text-2xl font-semibold text-text-primary mb-6 text-center">
-          Answer Your Financial Questions
-        </h2>
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
-          {/* Buy vs Rent */}
-          <div className="card card-sweep opacity-0 animate-fade-in-up stagger-1">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-accent-primary rounded-lg flex items-center justify-center transition-all hover:shadow-glow-blue flex-shrink-0">
-                <HomeIcon className="w-6 h-6 text-bg-primary" />
-              </div>
-              <h3 className="text-lg font-semibold text-text-primary">Buy vs Rent</h3>
+      {/* Calculators */}
+      <div className="pb-16 sm:pb-24 opacity-0 animate-fade-in-up stagger-1">
+        <div className="grid sm:grid-cols-3 gap-4 sm:gap-5">
+
+          <Link to="/buy-vs-rent" className="card card-sweep group opacity-0 animate-fade-in-up stagger-1">
+            <div className="w-10 h-10 rounded-lg bg-accent-primary/10 flex items-center justify-center mb-4 group-hover:bg-accent-primary/20 transition-colors">
+              <HomeIcon className="w-5 h-5 text-accent-primary" />
             </div>
-            <p className="text-text-secondary mb-4">
-              Should you buy a home or rent and invest the difference?
+            <h3 className="text-base font-semibold text-text-primary mb-1.5">Buy vs Rent</h3>
+            <p className="text-sm text-text-tertiary mb-4 leading-relaxed">
+              Same house &mdash; buy or rent? See the 20-year impact.
             </p>
-            <Link
-              to="/buy-vs-rent"
-              className="text-accent-primary hover:text-accent-light font-medium transition-colors"
-            >
-              Compare →
-            </Link>
+            <span className="text-xs font-semibold text-accent-primary uppercase tracking-wider group-hover:text-accent-light transition-colors">
+              Open Calculator
+            </span>
+          </Link>
+
+          <div className="card opacity-0 animate-fade-in-up stagger-2 cursor-default">
+            <div className="w-10 h-10 rounded-lg bg-border-subtle flex items-center justify-center mb-4">
+              <Car className="w-5 h-5 text-text-muted" />
+            </div>
+            <h3 className="text-base font-semibold text-text-secondary mb-1.5">Car vs Invest</h3>
+            <p className="text-sm text-text-tertiary mb-4 leading-relaxed">
+              What's the true cost of that car over 10 years?
+            </p>
+            <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+              Coming Soon
+            </span>
           </div>
 
-          {/* Car vs Invest */}
-          <div className="card card-sweep opacity-0 animate-fade-in-up stagger-2">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-accent-primary rounded-lg flex items-center justify-center transition-all hover:shadow-glow-blue flex-shrink-0">
-                <Car className="w-6 h-6 text-bg-primary" />
-              </div>
-              <h3 className="text-lg font-semibold text-text-primary">Car vs Invest</h3>
+          <div className="card opacity-0 animate-fade-in-up stagger-3 cursor-default">
+            <div className="w-10 h-10 rounded-lg bg-border-subtle flex items-center justify-center mb-4">
+              <PiggyBank className="w-5 h-5 text-text-muted" />
             </div>
-            <p className="text-text-secondary mb-4">
-              What's the impact of buying a car now vs investing that money?
+            <h3 className="text-base font-semibold text-text-secondary mb-1.5">Contribution Impact</h3>
+            <p className="text-sm text-text-tertiary mb-4 leading-relaxed">
+              How do monthly contributions compound over time?
             </p>
-            <Link
-              to="/scenario-setup?template=car-vs-invest"
-              className="text-accent-primary hover:text-accent-light font-medium transition-colors"
-            >
-              Compare →
-            </Link>
-          </div>
-
-          {/* Contribution Impact */}
-          <div className="card card-sweep opacity-0 animate-fade-in-up stagger-3">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-accent-primary rounded-lg flex items-center justify-center transition-all hover:shadow-glow-blue flex-shrink-0">
-                <PiggyBank className="w-6 h-6 text-bg-primary" />
-              </div>
-              <h3 className="text-lg font-semibold text-text-primary">Contribution Impact</h3>
-            </div>
-            <p className="text-text-secondary mb-4">
-              How much do your monthly contributions affect your net worth?
-            </p>
-            <Link
-              to="/scenario-setup?template=contribution"
-              className="text-accent-primary hover:text-accent-light font-medium transition-colors"
-            >
-              Compare →
-            </Link>
+            <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+              Coming Soon
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Value Proposition */}
-      <div className="bg-bg-secondary border border-border-default rounded-md p-6 sm:p-8 text-center opacity-0 animate-fade-in-up stagger-4">
-        <TrendingUp className="w-10 h-10 sm:w-12 sm:h-12 text-accent-primary mx-auto mb-4" />
-        <h2 className="text-xl sm:text-2xl font-semibold text-text-primary mb-3">
-          See the 20-Year Impact
-        </h2>
-        <p className="text-sm sm:text-base text-text-secondary max-w-2xl mx-auto mb-6">
-          Every financial decision compounds over time. True North shows you exactly how your
-          choices today will impact your wealth 20-30 years from now.
+      {/* Footer line */}
+      <div className="border-t border-border-subtle py-6 text-center opacity-0 animate-fade-in-up stagger-4">
+        <p className="text-xs text-text-muted">
+          Free &middot; No sign-up &middot; Your data stays on your device
         </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 md:gap-8 text-xs sm:text-sm text-text-tertiary">
-          <div className="flex items-center">
-            <div className="w-2 h-2 bg-accent-primary rounded-full mr-2"></div>
-            <span>No Auth Required</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-2 h-2 bg-accent-primary rounded-full mr-2"></div>
-            <span>Save Scenarios Locally</span>
-          </div>
-          <div className="flex items-center">
-            <div className="w-2 h-2 bg-accent-primary rounded-full mr-2"></div>
-            <span>Free Forever</span>
-          </div>
-        </div>
       </div>
     </div>
   );
